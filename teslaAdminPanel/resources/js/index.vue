@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="background-color:#000000; height:100vh;">
     <app-navigator />
     <router-view>
     </router-view>

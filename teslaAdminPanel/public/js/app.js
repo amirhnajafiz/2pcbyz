@@ -1959,11 +1959,33 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
     return {
       categories: []
     };
+  },
+  methods: {
+    getCategories: function getCategories() {
+      var _this = this;
+
+      axios.get("http://localhost:8000/api/categories").then(function (response) {
+        if (response.status >= 200 && response.status < 300) {
+          _this.categories = response.data.categories;
+        }
+      });
+    }
+  },
+  mounted: function mounted() {
+    this.getCategories();
   }
 });
 
@@ -38300,7 +38322,12 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", [_c("app-navigator"), _vm._v(" "), _c("router-view")], 1)
+  return _c(
+    "div",
+    { staticStyle: { "background-color": "#000000", height: "100vh" } },
+    [_c("app-navigator"), _vm._v(" "), _c("router-view")],
+    1
+  )
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -38334,31 +38361,43 @@ var render = function() {
           return [
             _c("thead", [
               _c("tr", [
-                _c("th", { staticClass: "text-left" }, [_vm._v("Image")]),
+                _c("th", { staticClass: "text-center" }, [_vm._v("Image")]),
                 _vm._v(" "),
-                _c("th", { staticClass: "text-left" }, [_vm._v("Name")]),
+                _c("th", { staticClass: "text-center" }, [_vm._v("Name")]),
                 _vm._v(" "),
-                _c("th", { staticClass: "text-left" }, [_vm._v("Ordering")]),
+                _c("th", { staticClass: "text-center" }, [_vm._v("Ordering")]),
                 _vm._v(" "),
-                _c("th", { staticClass: "text-left" }, [_vm._v("Edit")]),
+                _c("th", { staticClass: "text-center" }, [_vm._v("Edit")]),
                 _vm._v(" "),
-                _c("th", { staticClass: "text-left" }, [_vm._v("Delete")])
+                _c("th", { staticClass: "text-center" }, [_vm._v("Delete")])
               ])
             ]),
             _vm._v(" "),
-            _c("tbody", [
-              _c("tr", [
-                _c("td"),
-                _vm._v(" "),
-                _c("td"),
-                _vm._v(" "),
-                _c("td"),
-                _vm._v(" "),
-                _c("td"),
-                _vm._v(" "),
-                _c("td")
-              ])
-            ])
+            _c(
+              "tbody",
+              _vm._l(_vm.categories, function(category) {
+                return _c("tr", { key: category.id }, [
+                  _c("td", { staticClass: "text-center" }),
+                  _vm._v(" "),
+                  _c("td", { staticClass: "text-center" }, [
+                    _vm._v(
+                      "\n            " + _vm._s(category.name) + "\n        "
+                    )
+                  ]),
+                  _vm._v(" "),
+                  _c("td", { staticClass: "text-center" }, [
+                    _vm._v(
+                      "\n            " + _vm._s(category.order) + "\n        "
+                    )
+                  ]),
+                  _vm._v(" "),
+                  _c("td", { staticClass: "text-center" }),
+                  _vm._v(" "),
+                  _c("td", { staticClass: "text-center" })
+                ])
+              }),
+              0
+            )
           ]
         },
         proxy: true

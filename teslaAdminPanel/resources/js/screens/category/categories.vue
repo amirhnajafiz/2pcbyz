@@ -3,20 +3,28 @@
     <template v-slot:default>
       <thead>
         <tr>
-          <th class="text-left">Image</th>
-          <th class="text-left">Name</th>
-          <th class="text-left">Ordering</th>
-          <th class="text-left">Edit</th>
-          <th class="text-left">Delete</th>
+          <th class="text-center">Image</th>
+          <th class="text-center">Name</th>
+          <th class="text-center">Ordering</th>
+          <th class="text-center">Edit</th>
+          <th class="text-center">Delete</th>
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
+        <tr v-for="category in categories"
+            :key="category.id"
+        >
+          <td class="text-center">
+              
+          </td>
+          <td class="text-center">
+              {{ category.name }}
+          </td>
+          <td class="text-center">
+              {{ category.order }}
+          </td>
+          <td class="text-center"></td>
+          <td class="text-center"></td>
         </tr>
       </tbody>
     </template>
@@ -30,6 +38,18 @@ export default {
       categories: [],
     };
   },
+  methods: {
+    getCategories() {
+      axios.get("http://localhost:8000/api/categories").then((response) => {
+        if (response.status >= 200 && response.status < 300) {
+            this.categories = response.data.categories;
+        }
+      });
+    },
+  },
+  mounted() {
+      this.getCategories();
+  }
 };
 </script>
 
