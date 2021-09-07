@@ -25,7 +25,9 @@
         ></v-file-input>
       </v-row>
 
-      <v-btn color="success" v-on:click="submitForm()" class="mr-4"> Submit </v-btn>
+      <v-btn color="success" v-on:click="submitForm()" class="mr-4">
+        Submit
+      </v-btn>
     </v-form>
   </v-container>
 </template>
@@ -40,17 +42,26 @@ export default {
     };
   },
   methods: {
-      submitForm() {
-          axios.post('http://localhost:8000/api/add/category', {
-              name: this.name,
-              order: this.order,
-              image: this.image
-          }).then(response => {
-              console.log(response.data.name);
-          });
-          this.$refs.form.reset();
-      }
-  }
+    submitForm() {
+      let data = new FormData();
+      data.append("name", this.name);
+      data.append("order", this.order);
+      data.append("image", this.image);
+      axios
+        .post("http://localhost:8000/api/add/category", data)
+        .then((response) => {
+          if (response.status >= 200 && response.status < 300) {
+            this.$router.push("categories");
+            alert("Category added successfully");
+          } else {
+            alert("Something went wrong.");
+          }
+        }).catch(error => {
+            alert("Something went wrong with your request. Code " + error.response.status);
+        });
+      this.$refs.form.reset();
+    },
+  },
 };
 </script>
 

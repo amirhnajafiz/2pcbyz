@@ -13,10 +13,9 @@
       <tbody>
         <tr v-for="category in categories" :key="category.id">
           <td class="text-center">
-            <img
-              src="https://bordalo.observador.pt/v2/rs:fill:900/c:433:433:nowe:0:0/q:86/plain/https://s3.observador.pt/wp-content/uploads/2017/01/26172929/tesla-car-logo_433x433_acf_cropped.jpg"
-              style="height: 100px; width: 100px"
-            />
+            <div v-if="category.image">
+              <img :src="url + '/categories/' + category.image" style="height: 100px; width: 100px" />
+            </div>
           </td>
           <td class="text-center">
             {{ category.name }}
@@ -45,6 +44,7 @@ export default {
   data() {
     return {
       categories: [],
+      url: window.location.origin,
     };
   },
   methods: {

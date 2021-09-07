@@ -39,8 +39,21 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
+        $category = new Category();
+        $category->name = $request->name;
+        $category->order = $request->order;
+        $category->save();
+
+        if ($request->image) {
+            $image = $request->image;
+            $image_new_name = time() . $image->getClientOriginalName();
+            $image->move('categories/', $image_new_name);
+            $category->image = $image_new_name;
+            $category->save();
+        }
+
         return response()->json([
-            'name' => $request->name
+            'status' => 'success'
         ]);
     }
 
