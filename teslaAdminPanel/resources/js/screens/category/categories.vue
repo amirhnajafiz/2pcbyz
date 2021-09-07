@@ -12,7 +12,7 @@
       </thead>
       <tbody>
         <tr v-for="category in categories" :key="category.id">
-          <td class="text-center">
+          <td class="text-center" style="padding: 10px 20px;">
             <div v-if="category.image">
               <img
                 :src="url + '/categories/' + category.image"
