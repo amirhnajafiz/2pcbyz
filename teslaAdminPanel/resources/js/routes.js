@@ -1,4 +1,5 @@
-import Home from './components/Home'
+import Home from './components/Home';
+import Categories from './screens/category/Categories';
 
 export default {
     mode: 'history',
@@ -6,6 +7,10 @@ export default {
         {
             path: '/',
             component: Home
+        },
+        {
+            path: '/admin/categories',
+            component: Categories
         }
     ]
 }
