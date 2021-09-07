@@ -25,7 +25,7 @@
         ></v-file-input>
       </v-row>
 
-      <v-btn color="success" class="mr-4"> Submit </v-btn>
+      <v-btn color="success" v-on:click="submitForm()" class="mr-4"> Submit </v-btn>
     </v-form>
   </v-container>
 </template>
@@ -36,9 +36,21 @@ export default {
     return {
       name: "",
       order: null,
-      image: "",
+      image: null,
     };
   },
+  methods: {
+      submitForm() {
+          axios.post('http://localhost:8000/api/add/category', {
+              name: this.name,
+              order: this.order,
+              image: this.image
+          }).then(response => {
+              console.log(response.data.name);
+          });
+          this.$refs.form.reset();
+      }
+  }
 };
 </script>
 

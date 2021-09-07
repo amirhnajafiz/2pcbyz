@@ -39,7 +39,9 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        return response()->json([
+            'name' => $request->name
+        ]);
     }
 
     /**
