@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
+import vuetify from './vuetify';
 import routes from './routes';
 import index from './index'
 
@@ -22,8 +23,9 @@ window.Vue = require('vue').default;
 
 const app = new Vue({
     el: '#app',
+    vuetify,
     router: new VueRouter(routes),
     components: {
         index
-    }
+    },
 });
