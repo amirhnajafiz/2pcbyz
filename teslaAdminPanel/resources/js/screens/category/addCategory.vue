@@ -46,7 +46,8 @@ export default {
       let data = new FormData();
       data.append("name", this.name);
       data.append("order", this.order);
-      data.append("image", this.image);
+      if (this.image)
+        data.append("image", this.image);
       axios
         .post("http://localhost:8000/api/add/category", data)
         .then((response) => {

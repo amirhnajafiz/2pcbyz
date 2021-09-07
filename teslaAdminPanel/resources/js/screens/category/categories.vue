@@ -14,7 +14,16 @@
         <tr v-for="category in categories" :key="category.id">
           <td class="text-center">
             <div v-if="category.image">
-              <img :src="url + '/categories/' + category.image" style="height: 100px; width: 100px" />
+              <img
+                :src="url + '/categories/' + category.image"
+                style="height: 100px; width: 100px"
+              />
+            </div>
+            <div v-else>
+              <img
+                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSOk_gIBCpPiMsdVLX4u0dVdzWSrCkCUSMDuw&usqp=CAU"
+                style="height: 100px; width: 100px"
+              />
             </div>
           </td>
           <td class="text-center">
