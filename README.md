@@ -1,9 +1,4 @@
-<h1 align="center">
-    Dart
-</h1>
-
-<br />
-
+# Dart
 
 Dart is a client-optimized language 
 for developing fast apps on any platform. 
