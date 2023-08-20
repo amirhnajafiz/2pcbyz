@@ -1,9 +1,13 @@
 // ignore_for_file: avoid_print
+import 'dart:io';
 import 'package:web_socket_client/web_socket_client.dart';
+import 'package:dotenv/dotenv.dart';
 
 void main() async {
+  var env = DotEnv(includePlatformEnvironment: true)..load();
+  
   // Create a WebSocket client.
-  final uri = Uri.parse('ws://localhost:8080');
+  final uri = Uri.parse(env['SERVER_ADDRESS']);
   const backoff = ConstantBackoff(Duration(seconds: 1));
   final socket = WebSocket(uri, backoff: backoff);
 
