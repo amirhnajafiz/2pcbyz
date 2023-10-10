@@ -3,6 +3,7 @@ package worker
 import (
 	"context"
 	"fmt"
+	"log"
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/rest"
@@ -22,7 +23,12 @@ func (w Worker) Work(cfg *rest.Config) error {
 		ctx := context.Background()
 
 		for {
-			mc.MetricsV1beta1().NodeMetricses().List(ctx, v1.ListOptions{})
+			list, er := mc.MetricsV1beta1().NodeMetricses().List(ctx, v1.ListOptions{})
+			if er != nil {
+				log.Println(fmt.Errorf("failed to get metrics error=%w", er))
+
+				continue
+			}
 		}
 	}()
 
