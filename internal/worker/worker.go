@@ -29,6 +29,10 @@ func (w Worker) Work(cfg *rest.Config) error {
 
 				continue
 			}
+
+			for _, _ = range list.Items {
+				// item.Usage
+			}
 		}
 	}()
 
