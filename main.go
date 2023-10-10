@@ -1,9 +1,9 @@
 package main
 
 import (
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"github.com/amirhnajafiz/node-exporter/internal/worker"
+
 	"k8s.io/client-go/tools/clientcmd"
-	metrics "k8s.io/metrics/pkg/client/clientset/versioned"
 )
 
 func main() {
@@ -14,10 +14,7 @@ func main() {
 		panic(err)
 	}
 
-	mc, err := metrics.NewForConfig(config)
-	if err != nil {
-		panic(err)
-	}
-
-	mc.MetricsV1beta1().NodeMetricses().List(metav1.ListOptions{})
+	// create a new worker
+	w := worker.Worker{}
+	w.Work(config)
 }
