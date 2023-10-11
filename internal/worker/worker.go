@@ -14,7 +14,7 @@ import (
 )
 
 type Worker struct {
-	Metrics  handler.Metrics
+	Metrics  *handler.Metrics
 	Interval time.Duration
 }
 
