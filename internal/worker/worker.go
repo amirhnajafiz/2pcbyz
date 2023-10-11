@@ -40,6 +40,11 @@ func (w Worker) Work(cfg *rest.Config) error {
 				memory, _ := item.Usage.Memory().AsInt64()
 				pods, _ := item.Usage.Pods().AsInt64()
 				storage, _ := item.Usage.Storage().AsInt64()
+
+				w.Metrics.ObserveCPU(name, cpu)
+				w.Metrics.ObserveMemory(name, memory)
+				w.Metrics.ObservePods(name, pods)
+				w.Metrics.ObserveStorage(name, storage)
 			}
 		}
 	}()
