@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"time"
 
 	handler "github.com/amirhnajafiz/node-exporter/internal/metrics"
 
@@ -13,7 +14,8 @@ import (
 )
 
 type Worker struct {
-	Metrics handler.Metrics
+	Metrics  handler.Metrics
+	Interval time.Duration
 }
 
 func (w Worker) Work(cfg *rest.Config) error {
@@ -27,6 +29,7 @@ func (w Worker) Work(cfg *rest.Config) error {
 		ctx := context.Background()
 
 		for {
+			// get nodes
 			list, er := mc.MetricsV1beta1().NodeMetricses().List(ctx, v1.ListOptions{})
 			if er != nil {
 				log.Println(fmt.Errorf("failed to get metrics error=%w", er))
@@ -34,6 +37,7 @@ func (w Worker) Work(cfg *rest.Config) error {
 				continue
 			}
 
+			// get items resources
 			for _, item := range list.Items {
 				name := item.GetGenerateName()
 				cpu, _ := item.Usage.Cpu().AsInt64()
@@ -46,6 +50,8 @@ func (w Worker) Work(cfg *rest.Config) error {
 				w.Metrics.ObservePods(name, pods)
 				w.Metrics.ObserveStorage(name, storage)
 			}
+
+			time.Sleep(w.Interval)
 		}
 	}()
 
