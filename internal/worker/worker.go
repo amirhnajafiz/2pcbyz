@@ -34,8 +34,12 @@ func (w Worker) Work(cfg *rest.Config) error {
 				continue
 			}
 
-			for _, _ = range list.Items {
-				// item.Usage
+			for _, item := range list.Items {
+				name := item.GetGenerateName()
+				cpu, _ := item.Usage.Cpu().AsInt64()
+				memory, _ := item.Usage.Memory().AsInt64()
+				pods, _ := item.Usage.Pods().AsInt64()
+				storage, _ := item.Usage.Storage().AsInt64()
 			}
 		}
 	}()
