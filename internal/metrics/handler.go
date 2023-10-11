@@ -10,7 +10,7 @@ type Handler struct{}
 
 func (h Handler) Metrics() {
 	http.Handle("/metrics", promhttp.Handler())
-	if err := http.ListenAndServe(":2112", nil); err != nil {
+	if err := http.ListenAndServe(":80", nil); err != nil {
 		panic(err)
 	}
 }
