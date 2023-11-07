@@ -1,17 +1,17 @@
 package main
 
 import (
-	"github.com/amirhnajafiz/node-exporter/internal/metrics"
-	"github.com/amirhnajafiz/node-exporter/internal/worker"
 	"time"
 
-	"k8s.io/client-go/tools/clientcmd"
+	"github.com/amirhnajafiz/node-exporter/internal/metrics"
+	"github.com/amirhnajafiz/node-exporter/internal/worker"
+
+	"k8s.io/client-go/rest"
 )
 
 func main() {
-	// todo: convert it to read from kube config file
-	var kubeconfig, master string // empty, assuming inClusterConfig
-	config, err := clientcmd.BuildConfigFromFlags(master, kubeconfig)
+	// cluster client configs
+	config, err := rest.InClusterConfig()
 	if err != nil {
 		panic(err)
 	}
