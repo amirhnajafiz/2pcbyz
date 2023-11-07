@@ -1,6 +1,8 @@
 package main
 
 import (
+	"os"
+	"strconv"
 	"time"
 
 	"github.com/amirhnajafiz/node-exporter/internal/metrics"
@@ -16,18 +18,21 @@ func main() {
 		panic(err)
 	}
 
+	port, _ := strconv.Atoi(os.Getenv("SERVICE_PORT"))
+	interval, _ := strconv.Atoi(os.Getenv("INTERVAL"))
+
 	// create prometheus metrics
 	m := metrics.New()
 
 	// create a new worker
 	w := worker.Worker{
 		Metrics:  m,
-		Interval: 5 * time.Second,
+		Interval: time.Duration(interval) * time.Second,
 	}
 	if er := w.Work(config); er != nil {
 		panic(er)
 	}
 
 	// create handler
-	metrics.Handler{}.Metrics()
+	metrics.Handler{}.Metrics(port)
 }
