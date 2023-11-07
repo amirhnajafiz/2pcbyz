@@ -16,8 +16,8 @@ docker build . -f build/Dockerfile -t node-exporter:v0.1.0
 docker push node-exporter:v0.1.0 # push into your image repository
 ```
 
-Now execute docker container, and get metrics on ```ip:80/metrics```.
+Now execute docker container, and get metrics on ```ip:port/metrics```.
 
 ```shell
-docker run -d node-exporter:v0.1.0
+docker run -d -e HTTP_PORT=80 -e INTERVAL=5 node-exporter:v0.1.0
 ```
