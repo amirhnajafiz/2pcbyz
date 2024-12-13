@@ -4,6 +4,10 @@ func Default() Config {
 	return Config{
 		LogLevel: "error",
 		Name:     "C0",
+		Handler: HandlerConfig{
+			Instances: 0,
+			QueueSize: 0,
+		},
 		Storage: StorageConfig{
 			URI:      "mongo://localhost:1272",
 			Database: "C0",

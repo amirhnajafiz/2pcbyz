@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"os"
@@ -8,6 +9,7 @@ import (
 
 	"github.com/F24-CSE535/2pcbyz/cluster/internal/config"
 	"github.com/F24-CSE535/2pcbyz/cluster/internal/grpc"
+	"github.com/F24-CSE535/2pcbyz/cluster/internal/handler"
 	"github.com/F24-CSE535/2pcbyz/cluster/internal/storage"
 	"github.com/F24-CSE535/2pcbyz/cluster/pkg/logger"
 )
@@ -50,11 +52,27 @@ func main() {
 				return
 			}
 
+			// create a handler queue
+			queue := make(chan context.Context, cfg.Handler.QueueSize)
+
+			// create a new handler instance
+			hdl := handler.Handler{
+				Logger:  logr.Named("handler"),
+				Storage: stg,
+				Queue:   queue,
+			}
+
+			// start the handler instances in a go-routine
+			for i := 0; i < cfg.Handler.Instances; i++ {
+				go hdl.Start()
+			}
+
 			// create a bootstrap instance
 			bts := grpc.Bootstrap{
 				ServicePort: port,
 				Logger:      logr.Named("grpc"),
 				Storage:     stg,
+				Queue:       queue,
 			}
 
 			// start the gRPC server

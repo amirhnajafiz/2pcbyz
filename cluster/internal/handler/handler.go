@@ -1,4 +1,4 @@
-package sm
+package handler
 
 import (
 	"context"
@@ -14,4 +14,10 @@ type Handler struct {
 	Logger  *zap.Logger
 	Storage *storage.Storage
 	Queue   chan context.Context
+}
+
+func (h *Handler) Start() {
+	for {
+		<-h.Queue
+	}
 }

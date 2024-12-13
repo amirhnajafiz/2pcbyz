@@ -1,5 +1,11 @@
 package config
 
+// HandlerConfig stores the handler module config values.
+type HandlerConfig struct {
+	Instances int `koanf:"instances"`
+	QueueSize int `koanf:"queue_size"`
+}
+
 // StorageConfig stores the default values for MongoDB cluster.
 type StorageConfig struct {
 	URI       string `koanf:"uri"`
