@@ -4,12 +4,6 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/F24-CSE535/2pc/cluster/internal/grpc/services"
-	"github.com/F24-CSE535/2pc/cluster/internal/storage"
-	"github.com/F24-CSE535/2pc/cluster/pkg/packets"
-	"github.com/F24-CSE535/2pc/cluster/pkg/rpc/database"
-	"github.com/F24-CSE535/2pc/cluster/pkg/rpc/paxos"
-
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 )
@@ -22,9 +16,6 @@ type Bootstrap struct {
 // ListenAnsServer creates a new gRPC instance with all required services.
 func (b *Bootstrap) ListenAnsServer(
 	port int,
-	channel chan *packets.Packet,
-	dchannel chan *packets.Packet,
-	st *storage.Database,
 ) error {
 	// on the local network, listen to a port
 	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
@@ -39,14 +30,6 @@ func (b *Bootstrap) ListenAnsServer(
 	)
 
 	// register all gRPC services
-	database.RegisterDatabaseServer(server, &services.DatabaseService{
-		Storage:           st,
-		Channel:           channel,
-		DispatcherChannel: dchannel,
-	})
-	paxos.RegisterPaxosServer(server, &services.PaxosService{
-		Channel: channel,
-	})
 
 	// starting the server
 	b.Logger.Info("grpc started", zap.Int("port", port))
