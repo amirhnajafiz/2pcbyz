@@ -76,22 +76,12 @@ func main() {
 				session := <-mg.GetOutputChannel()
 				fmt.Printf("transaction %d: %s\n", session.Id, session.Text)
 			}
-		case "rt":
-			fmt.Println(mg.RoundTrip(cargsc, cargs))
 		case "printbalance":
 			fmt.Println(mg.PrintBalance(cargsc, cargs))
 		case "block":
 			fmt.Println(mg.Block(cargsc, cargs))
 		case "unblock":
 			fmt.Println(mg.Unblock(cargsc, cargs))
-		case "load":
-			fmt.Println(mg.LoadTests(cargsc, cargs))
-		case "current":
-			keys, items := mg.GetAllTests()
-			for _, key := range keys {
-				value := items[key]
-				fmt.Printf("%s. (%d sets) %s %s\n", key, len(value.Sets), value.LiveServers, value.ContactServers)
-			}
 		case "next":
 			tc, index := mg.GetTests()
 			if tc == nil {
@@ -121,9 +111,7 @@ func main() {
 				session := <-mg.GetOutputChannel()
 				fmt.Printf("transaction %d: %s\n", session.Id, session.Text)
 			}
-		case "performance":
-			fmt.Println(mg.Performance())
-		case "printdatastores":
+		case "printdatastore":
 			ds, msg := mg.PrintDatastores(cargsc, cargs)
 			if ds == nil {
 				fmt.Println(msg)
@@ -132,26 +120,6 @@ func main() {
 					fmt.Println(st)
 				}
 			}
-		case "printdatastore":
-			ds, msg := mg.PrintDatastore(cargsc, cargs)
-			if ds == nil {
-				fmt.Println(msg)
-			} else {
-				for _, st := range ds {
-					fmt.Println(st)
-				}
-			}
-		case "printlogs":
-			logs, msg := mg.PrintLogs(cargsc, cargs)
-			if logs == nil {
-				fmt.Println(msg)
-			} else {
-				for _, st := range logs {
-					fmt.Println(st)
-				}
-			}
-		case "rebalance":
-			fmt.Println(mg.ShardsRebalance(cargsc, cargs))
 		case "exit":
 			return
 		default:

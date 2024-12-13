@@ -2,7 +2,6 @@ package manager
 
 import (
 	"fmt"
-	"sort"
 	"strings"
 
 	grpc "github.com/F24-CSE535/2pc/client/internal/grpc/dialer"
@@ -61,22 +60,6 @@ func (m *Manager) GetChannel() chan *models.Packet {
 // GetOutputChannel returns the processor ourput channel.
 func (m *Manager) GetOutputChannel() chan *models.Session {
 	return m.output
-}
-
-// GetAllTests returns the current tests.
-func (m *Manager) GetAllTests() ([]string, map[string]*models.Testcase) {
-	// Create a slice to hold the keys
-	keys := make([]string, 0, len(m.tests))
-
-	// Populate the slice with the map's keys
-	for k := range m.tests {
-		keys = append(keys, k)
-	}
-
-	// Sort the slice of keys
-	sort.Strings(keys)
-
-	return keys, m.tests
 }
 
 // GetTests returns the next testcase.
