@@ -1,12 +1,69 @@
 package main
 
 import (
+	"fmt"
+	"log"
 	"os"
+	"sync"
+
+	"github.com/F24-CSE535/2pcbyz/cluster/internal/config"
+	"github.com/F24-CSE535/2pcbyz/cluster/internal/grpc"
+	"github.com/F24-CSE535/2pcbyz/cluster/internal/storage"
+	"github.com/F24-CSE535/2pcbyz/cluster/pkg/logger"
 )
 
 func main() {
 	args := os.Args
 	if len(args) < 3 {
-		panic("at least four arguments are needed (./main <config-path> <iptable-path>)")
+		panic("at least two arguments are needed (./main <config-path> <iptable>)")
 	}
+
+	// load config file
+	cfg := config.New(args[1])
+
+	// load iptable
+	_ = config.NewIPTable(args[2])
+
+	// create replicas based on the information provided in config
+	wg := sync.WaitGroup{}
+	for _, replica := range cfg.Replicas {
+		// add one value to wait-group
+		wg.Add(1)
+
+		// start a go-routine
+		go func(name string, port int) {
+			defer func() {
+				wg.Done() // call done on wait-group
+			}()
+
+			// create a new logger instance
+			logr := logger.NewLogger(cfg.LogLevel, fmt.Sprintf("%s_logs.csv", name))
+			if logr == nil {
+				log.Fatal("failed to initialize zap logger")
+				return
+			}
+
+			// open database connection
+			stg, err := storage.NewStorage(cfg.Storage.URI, cfg.Storage.Database)
+			if err != nil {
+				log.Fatal(err)
+				return
+			}
+
+			// create a bootstrap instance
+			bts := grpc.Bootstrap{
+				ServicePort: port,
+				Logger:      logr.Named("grpc"),
+				Storage:     stg,
+			}
+
+			// start the gRPC server
+			if err := bts.ListenAndServer(); err != nil {
+				log.Println(err)
+			}
+		}(replica.Name, replica.Port)
+	}
+
+	// wait for all replicas
+	wg.Wait()
 }

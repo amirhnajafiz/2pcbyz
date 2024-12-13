@@ -11,3 +11,10 @@ func Default() Config {
 		Replicas: []ReplicaConfig{},
 	}
 }
+
+func DefaultIPTable() IPTable {
+	return IPTable{
+		Endpoints: make(map[string]string),
+		Services:  make(map[string]string),
+	}
+}
