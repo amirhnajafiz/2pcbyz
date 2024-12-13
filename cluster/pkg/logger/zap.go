@@ -1,7 +1,6 @@
 package logger
 
 import (
-	"fmt"
 	"log"
 	"os"
 
@@ -9,35 +8,32 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
-// NewFileLogger creates a zap logger for file.
-func NewFileLogger(level string, prefix int) *zap.Logger {
+// NewLogger creates a zap logger instance.
+func NewLogger(level, out string) *zap.Logger {
 	var lvl zapcore.Level
 
+	// set zap logger level
 	if err := lvl.Set(level); err != nil {
 		log.Printf("cannot parse log level %s: %s", level, err)
 
 		lvl = zapcore.WarnLevel
 	}
 
-	name := fmt.Sprintf("logs%d.csv", prefix)
-
-	if err := os.Truncate(name, 0); err != nil {
-		panic(err)
-	}
-
-	file, err := os.OpenFile(name, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	// open `out` file for logs export
+	file, err := os.OpenFile(out, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
-		panic(err)
+		return nil
 	}
 
+	// create zapcore components
 	encoder := zapcore.NewConsoleEncoder(zap.NewDevelopmentEncoderConfig())
 	fileCore := zapcore.NewCore(encoder, zapcore.AddSync(file), lvl)
 	cores := []zapcore.Core{
 		fileCore,
 	}
 
+	// create new zap logger instance
 	core := zapcore.NewTee(cores...)
-	logger := zap.New(core, zap.AddCaller(), zap.AddStacktrace(zap.ErrorLevel))
 
-	return logger
+	return zap.New(core, zap.AddCaller(), zap.AddStacktrace(zap.ErrorLevel))
 }
