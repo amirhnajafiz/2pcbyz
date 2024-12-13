@@ -13,8 +13,6 @@ service PBFT {
   rpc Prepare(PrepareMsg) returns (google.protobuf.Empty) {}
   rpc AckPrepare(PrepareAck) returns (google.protobuf.Empty) {}
   rpc Commit(CommitMsg) returns (google.protobuf.Empty) {}
-  rpc ViewChange(ViewChangeMsg) returns (google.protobuf.Empty) {}
-  rpc NewView(NewViewMsg) returns (google.protobuf.Empty) {}
 }
 
 // transaction message contains a request operations sent by a client.
@@ -75,27 +73,5 @@ message CommitMsg {
   string node_id = 2;
   int64 sequence = 3;
   int64 view = 4;
-  repeated bytes signs = 5;
-}
-
-// viewchange is sent by any node to other nodes to start view change.
-// viewchange digest is hash of (view)
-// encrypted by the sign threshold key.
-message ViewChangeMsg {
-  string viewchange_digest = 1;
-  string node_id = 2;
-  int64 view = 3;
-  int64 sequence = 4;
-  bytes sign = 5;
-  repeated PrePrepareAck preprepare_acks = 6;
-}
-
-// newview is sent by the leader to other nodes to finish view change.
-// viewchange digest can be decrypted using signs threshold keys.
-message NewViewMsg {
-  string viewchange_digest = 1;
-  string node_id = 2;
-  int64 view = 3;
-  int64 sequence = 4;
   repeated bytes signs = 5;
 }
