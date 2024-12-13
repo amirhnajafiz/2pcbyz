@@ -11,9 +11,14 @@ import (
 
 // Config struct is a module that stores system configs.
 type Config struct {
+	LogLevel string          `koanf:"log_level"` // log level can be (debug, info, warn, error, panic, fatal)
+	Name     string          `koanf:"name"`      // cluster name
+	Replicas []ReplicaConfig `koanf:"replicas"`  // types.ReplicaConfig
+	Storage  StorageConfig   `koanf:"storage"`   // types.StorageConfig
 }
 
-// New reads configuration with koanf, by loading a yaml config path into the Config struct.
+// New reads configuration with koanf,
+// by loading a yaml config path into the Config struct.
 func New(path string) Config {
 	var instance Config
 
