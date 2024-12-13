@@ -1,0 +1,25 @@
+syntax = "proto3";
+package api;
+
+import "google/protobuf/empty.proto";
+
+option go_package = "./rpc/api";
+
+// creating rpc services for api system.
+service API {
+  rpc PrintBalance(PrintBalanceMsg) returns (PrintBalanceRsp) {}
+  rpc PrintDatastore(google.protobuf.Empty) returns (stream DatastoreRsp) {}
+}
+
+message PrintBalanceMsg {
+  string client = 1;
+}
+
+message PrintBalanceRsp {
+  int64 balance = 1;
+}
+
+message DatastoreRsp {
+  int64 sequence = 1;
+  int64 session_id = 2;
+}

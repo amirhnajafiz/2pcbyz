@@ -13,6 +13,10 @@ service PBFT {
   rpc Prepare(PrepareMsg) returns (google.protobuf.Empty) {}
   rpc AckPrepare(PrepareAck) returns (google.protobuf.Empty) {}
   rpc Commit(CommitMsg) returns (google.protobuf.Empty) {}
+  rpc Block(google.protobuf.Empty) returns (google.protobuf.Empty) {}
+  rpc Unblock(google.protobuf.Empty) returns (google.protobuf.Empty) {}
+  rpc Byzantine(google.protobuf.Empty) returns (google.protobuf.Empty) {}
+  rpc NonByzantine(google.protobuf.Empty) returns (google.protobuf.Empty) {}
 }
 
 // transaction message contains a request operations sent by a client.
