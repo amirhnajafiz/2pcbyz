@@ -91,16 +91,6 @@ func (m *Manager) Transaction(argc int, argv []string) (string, bool) {
 	amount, _ := strconv.Atoi(argv[2])
 	sessionId := m.memory.GetSession()
 
-	// get shards
-	senderCluster, err := m.storage.GetClientShard(sender)
-	if err != nil {
-		return fmt.Errorf("database failed: %v", err).Error(), false
-	}
-	receiverCluster, err := m.storage.GetClientShard(receiver)
-	if err != nil {
-		return fmt.Errorf("database failed: %v", err).Error(), false
-	}
-
 	// create a new session
 	session := models.Session{
 		Id:       sessionId,
@@ -108,29 +98,6 @@ func (m *Manager) Transaction(argc int, argv []string) (string, bool) {
 		Receiver: receiver,
 		Amount:   amount,
 		Replys:   make([]*database.ReplyMsg, 0),
-	}
-
-	// check for inter or cross shard
-	if senderCluster == receiverCluster {
-		session.Type = "inter-shard"
-		session.Participants = []string{senderCluster}
-
-		// for inter-shard send request message to the cluster
-		if err := m.dialer.Request(senderCluster, sender, receiver, amount, sessionId); err != nil {
-			return fmt.Errorf("server failed: %v", err).Error(), false
-		}
-	} else {
-		session.Type = "cross-shard"
-		session.Participants = []string{senderCluster, receiverCluster}
-		session.Acks = make([]*database.AckMsg, 0)
-
-		// for cross-shard send prepare messages to both clusters
-		if err := m.dialer.Prepare(senderCluster, sender, sender, receiver, amount, sessionId); err != nil {
-			return fmt.Errorf("sender server failed: %v", err).Error(), false
-		}
-		if err := m.dialer.Prepare(receiverCluster, receiver, sender, receiver, amount, sessionId); err != nil {
-			return fmt.Errorf("receiver server failed: %v", err).Error(), false
-		}
 	}
 
 	// save the transaction into cache

@@ -23,10 +23,3 @@ func (s *Server) Reply(_ context.Context, msg *database.ReplyMsg) (*emptypb.Empt
 
 	return &emptypb.Empty{}, nil
 }
-
-// Ack accepts all ack messages.
-func (s *Server) Ack(_ context.Context, msg *database.AckMsg) (*emptypb.Empty, error) {
-	s.channel <- &models.Packet{Label: enums.PktAck, Payload: msg}
-
-	return &emptypb.Empty{}, nil
-}

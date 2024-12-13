@@ -118,8 +118,6 @@ func (m *Manager) processor() {
 		switch pkt.Label {
 		case enums.PktReply:
 			m.handleReply(pkt.Payload.(*database.ReplyMsg))
-		case enums.PktAck:
-			m.handleAck(pkt.Payload.(*database.AckMsg))
 		}
 	}
 }

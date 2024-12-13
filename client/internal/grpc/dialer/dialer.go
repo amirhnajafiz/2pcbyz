@@ -60,71 +60,6 @@ func (d *Dialer) Request(target, sender, receiver string, amount, sessionId int)
 	return nil
 }
 
-// Request accepts a transaction parameters for a cross-shard transaction.
-func (d *Dialer) Prepare(target, client, sender, receiver string, amount, sessionId int) error {
-	// base connection
-	conn, err := d.connect(d.contacts[target])
-	if err != nil {
-		return err
-	}
-	defer conn.Close()
-
-	// call Prepare RPC
-	if _, err = database.NewDatabaseClient(conn).Prepare(context.Background(), &database.PrepareMsg{
-		Transaction: &database.TransactionMsg{ // initialize a new transaction
-			Sender:    sender,
-			Receiver:  receiver,
-			Amount:    int64(amount),
-			SessionId: int64(sessionId),
-		},
-		Client:        client,            // set the client for cluster usage
-		ReturnAddress: d.Nodes["client"], // set the return address
-	}); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// Commit accepts a target and sessionId to send a commit message.
-func (d *Dialer) Commit(target string, sessionId int) error {
-	// base connection
-	conn, err := d.connect(d.contacts[target])
-	if err != nil {
-		return err
-	}
-	defer conn.Close()
-
-	// call Commit RPC
-	if _, err = database.NewDatabaseClient(conn).Commit(context.Background(), &database.CommitMsg{
-		SessionId:     int64(sessionId),  // set the session id
-		ReturnAddress: d.Nodes["client"], // set the return address
-	}); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// Abort accepts a target and sessionId to send an abort message.
-func (d *Dialer) Abort(target string, sessionId int) error {
-	// base connection
-	conn, err := d.connect(d.contacts[target])
-	if err != nil {
-		return err
-	}
-	defer conn.Close()
-
-	// call Abort RPC
-	if _, err = database.NewDatabaseClient(conn).Abort(context.Background(), &database.AbortMsg{
-		SessionId: int64(sessionId), // set the session id
-	}); err != nil {
-		return err
-	}
-
-	return nil
-}
-
 // PrintBalance accepts a target and client to return the client balance.
 func (d *Dialer) PrintBalance(target string, client string) (int, error) {
 	// base connection
@@ -143,40 +78,6 @@ func (d *Dialer) PrintBalance(target string, client string) (int, error) {
 	}
 
 	return int(resp.GetBalance()), nil
-}
-
-// PrintLogs accepts a target and calls PrintLogs RPC on the target.
-func (d *Dialer) PrintLogs(target string) ([]string, error) {
-	// base connection
-	conn, err := d.connect(target)
-	if err != nil {
-		return nil, err
-	}
-	defer conn.Close()
-
-	// open a stream on PrintLogs to get blocks
-	stream, err := database.NewDatabaseClient(conn).PrintLogs(context.Background(), &emptypb.Empty{})
-	if err != nil {
-		return nil, fmt.Errorf("failed to process printlogs: %v", err)
-	}
-
-	// create a list to store logs
-	list := make([]string, 0)
-
-	for {
-		// read logs one by one
-		in, err := stream.Recv()
-		if err != nil {
-			if err == io.EOF { // send a response once the stream is closed
-				return list, nil
-			}
-
-			return nil, fmt.Errorf("failed to receive log: %v", err)
-		}
-
-		// append to the list of blocks
-		list = append(list, in.String())
-	}
 }
 
 // PrintDatastore accepts a target and calls PrintDatastore RPC on the target.
@@ -245,26 +146,4 @@ func (d *Dialer) Unblock(target string) error {
 	}
 
 	return nil
-}
-
-// Rebalance calls the rebalance RPC on a target.
-func (d *Dialer) Rebalance(target string, record string, value int, isAdd bool) (string, int, error) {
-	// base connection
-	conn, err := d.connect(target)
-	if err != nil {
-		return "", 0, err
-	}
-	defer conn.Close()
-
-	// call Rebalance RPC
-	resp, err := database.NewDatabaseClient(conn).Rebalance(context.Background(), &database.RebalanceMsg{
-		Record:  record,
-		Balance: int64(value),
-		Add:     isAdd,
-	})
-	if err != nil {
-		return "", 0, err
-	}
-
-	return resp.GetRecord(), int(resp.GetBalance()), nil
 }
