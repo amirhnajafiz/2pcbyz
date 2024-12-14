@@ -4,5 +4,5 @@ package config
 type ShardConfig struct {
 	Name    string `koanf:"name"`
 	Cluster string `koanf:"cluster"`
-	Range   string `koanf:"range"`
+	Range   []int  `koanf:"range"`
 }
