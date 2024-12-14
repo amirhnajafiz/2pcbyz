@@ -20,18 +20,12 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Database_Request_FullMethodName        = "/database.Database/Request"
-	Database_Reply_FullMethodName          = "/database.Database/Reply"
-	Database_Prepare_FullMethodName        = "/database.Database/Prepare"
-	Database_Ack_FullMethodName            = "/database.Database/Ack"
-	Database_Commit_FullMethodName         = "/database.Database/Commit"
-	Database_Abort_FullMethodName          = "/database.Database/Abort"
-	Database_Rebalance_FullMethodName      = "/database.Database/Rebalance"
-	Database_PrintBalance_FullMethodName   = "/database.Database/PrintBalance"
-	Database_PrintLogs_FullMethodName      = "/database.Database/PrintLogs"
-	Database_PrintDatastore_FullMethodName = "/database.Database/PrintDatastore"
-	Database_Block_FullMethodName          = "/database.Database/Block"
-	Database_Unblock_FullMethodName        = "/database.Database/Unblock"
+	Database_Request_FullMethodName = "/database.Database/Request"
+	Database_Reply_FullMethodName   = "/database.Database/Reply"
+	Database_Prepare_FullMethodName = "/database.Database/Prepare"
+	Database_Ack_FullMethodName     = "/database.Database/Ack"
+	Database_Commit_FullMethodName  = "/database.Database/Commit"
+	Database_Abort_FullMethodName   = "/database.Database/Abort"
 )
 
 // DatabaseClient is the client API for Database service.
@@ -46,12 +40,6 @@ type DatabaseClient interface {
 	Ack(ctx context.Context, in *AckMsg, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	Commit(ctx context.Context, in *CommitMsg, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	Abort(ctx context.Context, in *AbortMsg, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	Rebalance(ctx context.Context, in *RebalanceMsg, opts ...grpc.CallOption) (*RebalanceRsp, error)
-	PrintBalance(ctx context.Context, in *PrintBalanceMsg, opts ...grpc.CallOption) (*PrintBalanceRsp, error)
-	PrintLogs(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (grpc.ServerStreamingClient[LogRsp], error)
-	PrintDatastore(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (grpc.ServerStreamingClient[DatastoreRsp], error)
-	Block(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	Unblock(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type databaseClient struct {
@@ -122,84 +110,6 @@ func (c *databaseClient) Abort(ctx context.Context, in *AbortMsg, opts ...grpc.C
 	return out, nil
 }
 
-func (c *databaseClient) Rebalance(ctx context.Context, in *RebalanceMsg, opts ...grpc.CallOption) (*RebalanceRsp, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(RebalanceRsp)
-	err := c.cc.Invoke(ctx, Database_Rebalance_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *databaseClient) PrintBalance(ctx context.Context, in *PrintBalanceMsg, opts ...grpc.CallOption) (*PrintBalanceRsp, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(PrintBalanceRsp)
-	err := c.cc.Invoke(ctx, Database_PrintBalance_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *databaseClient) PrintLogs(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (grpc.ServerStreamingClient[LogRsp], error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &Database_ServiceDesc.Streams[0], Database_PrintLogs_FullMethodName, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	x := &grpc.GenericClientStream[emptypb.Empty, LogRsp]{ClientStream: stream}
-	if err := x.ClientStream.SendMsg(in); err != nil {
-		return nil, err
-	}
-	if err := x.ClientStream.CloseSend(); err != nil {
-		return nil, err
-	}
-	return x, nil
-}
-
-// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type Database_PrintLogsClient = grpc.ServerStreamingClient[LogRsp]
-
-func (c *databaseClient) PrintDatastore(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (grpc.ServerStreamingClient[DatastoreRsp], error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &Database_ServiceDesc.Streams[1], Database_PrintDatastore_FullMethodName, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	x := &grpc.GenericClientStream[emptypb.Empty, DatastoreRsp]{ClientStream: stream}
-	if err := x.ClientStream.SendMsg(in); err != nil {
-		return nil, err
-	}
-	if err := x.ClientStream.CloseSend(); err != nil {
-		return nil, err
-	}
-	return x, nil
-}
-
-// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type Database_PrintDatastoreClient = grpc.ServerStreamingClient[DatastoreRsp]
-
-func (c *databaseClient) Block(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, Database_Block_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *databaseClient) Unblock(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, Database_Unblock_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // DatabaseServer is the server API for Database service.
 // All implementations must embed UnimplementedDatabaseServer
 // for forward compatibility.
@@ -212,12 +122,6 @@ type DatabaseServer interface {
 	Ack(context.Context, *AckMsg) (*emptypb.Empty, error)
 	Commit(context.Context, *CommitMsg) (*emptypb.Empty, error)
 	Abort(context.Context, *AbortMsg) (*emptypb.Empty, error)
-	Rebalance(context.Context, *RebalanceMsg) (*RebalanceRsp, error)
-	PrintBalance(context.Context, *PrintBalanceMsg) (*PrintBalanceRsp, error)
-	PrintLogs(*emptypb.Empty, grpc.ServerStreamingServer[LogRsp]) error
-	PrintDatastore(*emptypb.Empty, grpc.ServerStreamingServer[DatastoreRsp]) error
-	Block(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
-	Unblock(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
 	mustEmbedUnimplementedDatabaseServer()
 }
 
@@ -245,24 +149,6 @@ func (UnimplementedDatabaseServer) Commit(context.Context, *CommitMsg) (*emptypb
 }
 func (UnimplementedDatabaseServer) Abort(context.Context, *AbortMsg) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Abort not implemented")
-}
-func (UnimplementedDatabaseServer) Rebalance(context.Context, *RebalanceMsg) (*RebalanceRsp, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Rebalance not implemented")
-}
-func (UnimplementedDatabaseServer) PrintBalance(context.Context, *PrintBalanceMsg) (*PrintBalanceRsp, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method PrintBalance not implemented")
-}
-func (UnimplementedDatabaseServer) PrintLogs(*emptypb.Empty, grpc.ServerStreamingServer[LogRsp]) error {
-	return status.Errorf(codes.Unimplemented, "method PrintLogs not implemented")
-}
-func (UnimplementedDatabaseServer) PrintDatastore(*emptypb.Empty, grpc.ServerStreamingServer[DatastoreRsp]) error {
-	return status.Errorf(codes.Unimplemented, "method PrintDatastore not implemented")
-}
-func (UnimplementedDatabaseServer) Block(context.Context, *emptypb.Empty) (*emptypb.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Block not implemented")
-}
-func (UnimplementedDatabaseServer) Unblock(context.Context, *emptypb.Empty) (*emptypb.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Unblock not implemented")
 }
 func (UnimplementedDatabaseServer) mustEmbedUnimplementedDatabaseServer() {}
 func (UnimplementedDatabaseServer) testEmbeddedByValue()                  {}
@@ -393,100 +279,6 @@ func _Database_Abort_Handler(srv interface{}, ctx context.Context, dec func(inte
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Database_Rebalance_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(RebalanceMsg)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(DatabaseServer).Rebalance(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Database_Rebalance_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DatabaseServer).Rebalance(ctx, req.(*RebalanceMsg))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Database_PrintBalance_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(PrintBalanceMsg)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(DatabaseServer).PrintBalance(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Database_PrintBalance_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DatabaseServer).PrintBalance(ctx, req.(*PrintBalanceMsg))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Database_PrintLogs_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(emptypb.Empty)
-	if err := stream.RecvMsg(m); err != nil {
-		return err
-	}
-	return srv.(DatabaseServer).PrintLogs(m, &grpc.GenericServerStream[emptypb.Empty, LogRsp]{ServerStream: stream})
-}
-
-// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type Database_PrintLogsServer = grpc.ServerStreamingServer[LogRsp]
-
-func _Database_PrintDatastore_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(emptypb.Empty)
-	if err := stream.RecvMsg(m); err != nil {
-		return err
-	}
-	return srv.(DatabaseServer).PrintDatastore(m, &grpc.GenericServerStream[emptypb.Empty, DatastoreRsp]{ServerStream: stream})
-}
-
-// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type Database_PrintDatastoreServer = grpc.ServerStreamingServer[DatastoreRsp]
-
-func _Database_Block_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(emptypb.Empty)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(DatabaseServer).Block(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Database_Block_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DatabaseServer).Block(ctx, req.(*emptypb.Empty))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Database_Unblock_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(emptypb.Empty)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(DatabaseServer).Unblock(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Database_Unblock_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DatabaseServer).Unblock(ctx, req.(*emptypb.Empty))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 // Database_ServiceDesc is the grpc.ServiceDesc for Database service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -518,34 +310,7 @@ var Database_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "Abort",
 			Handler:    _Database_Abort_Handler,
 		},
-		{
-			MethodName: "Rebalance",
-			Handler:    _Database_Rebalance_Handler,
-		},
-		{
-			MethodName: "PrintBalance",
-			Handler:    _Database_PrintBalance_Handler,
-		},
-		{
-			MethodName: "Block",
-			Handler:    _Database_Block_Handler,
-		},
-		{
-			MethodName: "Unblock",
-			Handler:    _Database_Unblock_Handler,
-		},
 	},
-	Streams: []grpc.StreamDesc{
-		{
-			StreamName:    "PrintLogs",
-			Handler:       _Database_PrintLogs_Handler,
-			ServerStreams: true,
-		},
-		{
-			StreamName:    "PrintDatastore",
-			Handler:       _Database_PrintDatastore_Handler,
-			ServerStreams: true,
-		},
-	},
+	Streams:  []grpc.StreamDesc{},
 	Metadata: "database.proto",
 }

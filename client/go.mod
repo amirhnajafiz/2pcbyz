@@ -1,4 +1,4 @@
-module github.com/F24-CSE535/2pc/client
+module github.com/F24-CSE535/2pcbyz/client
 
 go 1.23.1
 
