@@ -10,8 +10,8 @@ import (
 	"google.golang.org/grpc"
 )
 
-// StartNewServer accepts a port and channel to get and forward packets to the processor.
-func StartNewServer(port int) error {
+// ListenAndServe accepts a port and starts a gRPC server.
+func ListenAndServe(port int) error {
 	// on the local network, listen to a port
 	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
 	if err != nil {

@@ -8,12 +8,12 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-// serve4 is a partial gRPC service in client side.
+// server is a partial gRPC service in client side.
 type server struct {
 	database.UnimplementedDatabaseServer
 }
 
-// Reply accepts all reply messages.
+// Reply accepts all reply messages from system nodes.
 func (s *server) Reply(_ context.Context, msg *database.ReplyMsg) (*emptypb.Empty, error) {
 	return &emptypb.Empty{}, nil
 }
