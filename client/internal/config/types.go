@@ -1,7 +1,8 @@
 package config
 
-// StorageConfig stores the default values for MongoDB cluster.
-type StorageConfig struct {
-	URI      string `koanf:"uri"`
-	Database string `koanf:"database"`
+// ShardConfig stores the values of shards creation.
+type ShardConfig struct {
+	Name    string `koanf:"name"`
+	Cluster string `koanf:"cluster"`
+	Range   string `koanf:"range"`
 }

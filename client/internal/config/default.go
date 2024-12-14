@@ -2,11 +2,8 @@ package config
 
 func Default() Config {
 	return Config{
-		Port: 5001,
-		Storage: StorageConfig{
-			URI:      "mongo://localhost:1272",
-			Database: "C0",
-		},
+		Port:   5001,
+		Shards: make([]ShardConfig, 0),
 	}
 }
 

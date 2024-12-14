@@ -11,12 +11,11 @@ import (
 
 // Config struct is a module that stores system configs.
 type Config struct {
-	Port    int           `koanf:"grpc_port"`
-	Storage StorageConfig `koanf:"storage"` // types.StorageConfig
+	Port   int           `koanf:"grpc_port"`
+	Shards []ShardConfig `koanf:"shards"` // types.ShardConfig
 }
 
-// New reads configuration with koanf,
-// by loading a yaml config path into the Config struct.
+// New reads configuration with koanf, by loading a yaml config path into the Config struct.
 func New(path string) Config {
 	var instance Config
 
