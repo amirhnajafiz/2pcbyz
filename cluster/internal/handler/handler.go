@@ -25,6 +25,10 @@ func (h *Handler) Start() {
 		switch ctx.Value("method") {
 		case "request":
 			h.request(ctx.Value("request"))
+		case "abort":
+			h.abort(ctx.Value("request"))
+		case "commit":
+			h.commit(ctx.Value("request"))
 		}
 	}
 }
