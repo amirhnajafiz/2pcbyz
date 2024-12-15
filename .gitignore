@@ -2,8 +2,7 @@
 vendor/
 main
 main~
-logs.csv
-logs*.csv
+*logs*.csv
 new-schema.txt
 
 # app directoires
