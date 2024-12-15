@@ -3,6 +3,7 @@ package handler
 import (
 	"errors"
 	"fmt"
+	"os"
 	"strconv"
 
 	"github.com/F24-CSE535/2pcbyz/client/internal/network"
@@ -40,18 +41,18 @@ func (h *Handler) request(argc int, argv []string) (string, error) {
 		return "", fmt.Errorf("rpc failed: %v", err)
 	}
 
-	return fmt.Sprintf("transaction %d submitted", session), nil
+	return fmt.Sprintf("transaction %d (%s %s) submitted", session, sender, receiver), nil
 }
 
 // next runs the next testcase.
 func (h *Handler) next(_ int, _ []string) (string, error) {
 	// check the index variable
 	if h.index == len(h.tests) {
-		return "", nil
+		return "end of tests", nil
 	}
 
 	// make transactions by calling the handler request
-	output := ""
+	output := fmt.Sprintf("test set %d:\n", h.index+1)
 	for _, trx := range h.tests[h.index]["transactions"].([][]string) {
 		if msg, err := h.request(3, trx); err != nil {
 			return "", err
@@ -64,4 +65,11 @@ func (h *Handler) next(_ int, _ []string) (string, error) {
 	h.index++
 
 	return output, nil
+}
+
+// exit terminates the client program.
+func (h *Handler) exit(_ int, _ []string) (string, error) {
+	os.Exit(0)
+
+	return "", nil
 }

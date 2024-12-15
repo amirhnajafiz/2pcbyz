@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/F24-CSE535/2pcbyz/client/internal/config"
 	"github.com/F24-CSE535/2pcbyz/client/internal/handler"
@@ -30,6 +31,7 @@ func main() {
 	// load the input tests
 	if len(args) == 4 {
 		if val, err := utils.CSVParseTestcaseFile(args[3]); err == nil {
+			fmt.Printf("`%s` tests loaded.\n", args[3])
 			hd.SetTests(val)
 		}
 	}
@@ -46,10 +48,13 @@ func main() {
 		}
 	}()
 
+	// wait for sub-processes to start
+	time.Sleep(1 * time.Second)
+
 	// in a for loop, read user commands
 	reader := bufio.NewReader(os.Stdin)
 	for {
-		fmt.Print("\n$ ")
+		fmt.Print("$ ")
 
 		input, _ := reader.ReadString('\n') // read input until newline
 		input = strings.TrimSpace(input)
