@@ -16,6 +16,7 @@ type Config struct {
 	Handler  HandlerConfig   `koanf:"handler"`   // types.HandlerConfig
 	Replicas []ReplicaConfig `koanf:"replicas"`  // types.ReplicaConfig
 	Shard    ShardConfig     `koanf:"shard"`     // types.ShardConfig
+	Shards   []ShardConfig   `koanf:"shards"`    // types.ShardConfig
 	Storage  StorageConfig   `koanf:"storage"`   // types.StorageConfig
 }
 

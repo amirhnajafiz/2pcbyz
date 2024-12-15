@@ -13,11 +13,12 @@ func Default() Config {
 			Database: "C0",
 		},
 		Shard: ShardConfig{
-			Name: "D0",
-			From: 0,
-			To:   0,
+			Cluster: "C0",
+			From:    0,
+			To:      0,
 		},
-		Replicas: []ReplicaConfig{},
+		Shards:   make([]ShardConfig, 0),
+		Replicas: make([]ReplicaConfig, 0),
 	}
 }
 

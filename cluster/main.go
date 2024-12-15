@@ -69,6 +69,7 @@ func main() {
 
 			// create a new handler instance
 			hdl := handler.Handler{
+				Cfg:     &cfg,
 				Logger:  logr.Named("handler"),
 				Storage: stg,
 				Queue:   queue,
