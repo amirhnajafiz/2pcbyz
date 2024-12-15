@@ -9,7 +9,7 @@ option go_package = "./rpc/database";
 service Database {
   rpc Request(RequestMsg) returns (google.protobuf.Empty) {}
   rpc Reply(ReplyMsg) returns (google.protobuf.Empty) {}
-  rpc Prepare(PrepareMsg) returns (google.protobuf.Empty) {}
+  rpc Prepare(RequestMsg) returns (google.protobuf.Empty) {}
   rpc Ack(AckMsg) returns (google.protobuf.Empty) {}
   rpc Commit(CommitMsg) returns (google.protobuf.Empty) {}
   rpc Abort(AbortMsg) returns (google.protobuf.Empty) {}
@@ -36,13 +36,6 @@ message ReplyMsg {
   string text = 2;
   string return_address = 3;
   string participant_address = 4;
-}
-
-// prepare is used in the first phase of 2pc.
-message PrepareMsg {
-  TransactionMsg transaction = 1;
-  string client = 2;
-  string return_address = 3;
 }
 
 // ack is returned by nodes for 2pc.

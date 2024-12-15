@@ -7,7 +7,7 @@ import (
 )
 
 // Prepare accepts a transaction parameters for a cross-shard transaction.
-func Prepare(address string, in *database.PrepareMsg) error {
+func Prepare(address string, in *database.RequestMsg) error {
 	// base connection
 	conn, err := connect(address)
 	if err != nil {

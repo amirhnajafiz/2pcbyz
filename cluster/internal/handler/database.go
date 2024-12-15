@@ -28,10 +28,9 @@ func (h *Handler) begin(payload interface{}) {
 	rshard := findClientShard(trx.GetTransaction().GetReceiver(), h.Cfg.Shards)
 
 	// check transaction type
-	var ctx context.Context
 	if sshard == rshard {
 		// call inter-shard
-		ctx = context.WithValue(
+		h.Queue <- context.WithValue(
 			context.WithValue(
 				context.Background(),
 				"method",
@@ -43,20 +42,13 @@ func (h *Handler) begin(payload interface{}) {
 	} else {
 		trx.CoordinatorAddress = localAddress(h.Port)
 
-		// call cross-shard
-		ctx = context.WithValue(
-			context.WithValue(
-				context.Background(),
-				"method",
-				"crossshard",
-			),
-			"request",
-			trx,
-		)
-	}
+		h.Logger.Info("cross-shard transaction", zap.Int64("session_id", trx.GetTransaction().GetSessionId()))
 
-	// reconcile the context again
-	h.Queue <- ctx
+		// call cross-shard
+		if err := network.Prepare(localAddress(h.Port), trx); err != nil {
+			h.Logger.Error("failed to call participant", zap.Error(err))
+		}
+	}
 }
 
 func (h *Handler) intershard(payload interface{}) {
@@ -142,7 +134,7 @@ func (h *Handler) intershard(payload interface{}) {
 	h.Queue <- ctx
 }
 
-func (h *Handler) crossshard(payload interface{}) {
+func (h *Handler) prepare(payload interface{}) {
 	// get transaction
 	trx := payload.(*database.RequestMsg)
 
@@ -301,12 +293,12 @@ func (h *Handler) reply(payload interface{}) {
 
 	// callback the cluster
 	if ctx.Value("method").(string) == "abort" {
-		// call abort
+		// call abort on participant
 		if err := network.Abort(msg.GetParticipantAddress(), msg.GetReturnAddress(), sessionId); err != nil {
 			h.Logger.Warn("failed to call the participant", zap.Error(err))
 		}
 	} else if ctx.Value("method").(string) == "commit" {
-		// call commit
+		// call commit on participant
 		if err := network.Commit(msg.GetParticipantAddress(), msg.GetReturnAddress(), sessionId); err != nil {
 			h.Logger.Warn("failed to call the participant", zap.Error(err))
 		}

@@ -37,8 +37,8 @@ func (h *Handler) Start() {
 			h.begin(payload)
 		case "intershard":
 			h.intershard(payload)
-		case "crosshard":
-			h.crossshard(payload)
+		case "prepare":
+			h.prepare(payload)
 		case "reply":
 			h.reply(payload)
 		case "abort":

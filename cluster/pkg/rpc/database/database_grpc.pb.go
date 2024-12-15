@@ -36,7 +36,7 @@ const (
 type DatabaseClient interface {
 	Request(ctx context.Context, in *RequestMsg, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	Reply(ctx context.Context, in *ReplyMsg, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	Prepare(ctx context.Context, in *PrepareMsg, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	Prepare(ctx context.Context, in *RequestMsg, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	Ack(ctx context.Context, in *AckMsg, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	Commit(ctx context.Context, in *CommitMsg, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	Abort(ctx context.Context, in *AbortMsg, opts ...grpc.CallOption) (*emptypb.Empty, error)
@@ -70,7 +70,7 @@ func (c *databaseClient) Reply(ctx context.Context, in *ReplyMsg, opts ...grpc.C
 	return out, nil
 }
 
-func (c *databaseClient) Prepare(ctx context.Context, in *PrepareMsg, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+func (c *databaseClient) Prepare(ctx context.Context, in *RequestMsg, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, Database_Prepare_FullMethodName, in, out, cOpts...)
@@ -118,7 +118,7 @@ func (c *databaseClient) Abort(ctx context.Context, in *AbortMsg, opts ...grpc.C
 type DatabaseServer interface {
 	Request(context.Context, *RequestMsg) (*emptypb.Empty, error)
 	Reply(context.Context, *ReplyMsg) (*emptypb.Empty, error)
-	Prepare(context.Context, *PrepareMsg) (*emptypb.Empty, error)
+	Prepare(context.Context, *RequestMsg) (*emptypb.Empty, error)
 	Ack(context.Context, *AckMsg) (*emptypb.Empty, error)
 	Commit(context.Context, *CommitMsg) (*emptypb.Empty, error)
 	Abort(context.Context, *AbortMsg) (*emptypb.Empty, error)
@@ -138,7 +138,7 @@ func (UnimplementedDatabaseServer) Request(context.Context, *RequestMsg) (*empty
 func (UnimplementedDatabaseServer) Reply(context.Context, *ReplyMsg) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Reply not implemented")
 }
-func (UnimplementedDatabaseServer) Prepare(context.Context, *PrepareMsg) (*emptypb.Empty, error) {
+func (UnimplementedDatabaseServer) Prepare(context.Context, *RequestMsg) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Prepare not implemented")
 }
 func (UnimplementedDatabaseServer) Ack(context.Context, *AckMsg) (*emptypb.Empty, error) {
@@ -208,7 +208,7 @@ func _Database_Reply_Handler(srv interface{}, ctx context.Context, dec func(inte
 }
 
 func _Database_Prepare_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(PrepareMsg)
+	in := new(RequestMsg)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -220,7 +220,7 @@ func _Database_Prepare_Handler(srv interface{}, ctx context.Context, dec func(in
 		FullMethod: Database_Prepare_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DatabaseServer).Prepare(ctx, req.(*PrepareMsg))
+		return srv.(DatabaseServer).Prepare(ctx, req.(*RequestMsg))
 	}
 	return interceptor(ctx, in, info, handler)
 }
