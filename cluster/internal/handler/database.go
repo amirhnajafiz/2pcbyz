@@ -13,6 +13,16 @@ func (h *Handler) begin(payload interface{}) {
 	// get transaction
 	trx := payload.(*database.RequestMsg)
 
+	// insert transaction
+	if err := h.Storage.InsertTransaction(&models.Transaction{
+		Sender:    trx.GetTransaction().GetSender(),
+		Receiver:  trx.GetTransaction().GetReceiver(),
+		Amount:    int(trx.GetTransaction().GetAmount()),
+		SessionId: int(trx.GetTransaction().GetSessionId()),
+	}); err != nil {
+		h.Logger.Warn("failed to store transaction", zap.Error(err))
+	}
+
 	// get both shards
 	sshard := findClientShard(trx.GetTransaction().GetSender(), h.Cfg.Shards)
 	rshard := findClientShard(trx.GetTransaction().GetReceiver(), h.Cfg.Shards)
@@ -89,16 +99,6 @@ func (h *Handler) intershard(payload interface{}) {
 		return
 	}
 
-	// insert transaction
-	if err := h.Storage.InsertTransaction(&models.Transaction{
-		Sender:    trx.GetTransaction().GetSender(),
-		Receiver:  trx.GetTransaction().GetReceiver(),
-		Amount:    int(trx.GetTransaction().GetAmount()),
-		SessionId: sessionId,
-	}); err != nil {
-		h.Logger.Warn("failed to store transaction", zap.Error(err))
-	}
-
 	// get the sender balance
 	balance, err := h.Storage.GetClientBalance(trx.GetTransaction().GetSender())
 	if err != nil {
@@ -141,7 +141,177 @@ func (h *Handler) intershard(payload interface{}) {
 }
 
 func (h *Handler) crossshard(payload interface{}) {
+	// get transaction
+	trx := payload.(*database.RequestMsg)
 
+	// get sessionId
+	sessionId := int(trx.GetTransaction().GetSessionId())
+
+	// insert locks
+	if err := h.Storage.InsertLock(trx.GetTransaction().GetReceiver()); err != nil {
+		h.Logger.Warn("failed to stores locks", zap.Int("session id", sessionId))
+	}
+
+	// insert logs
+	wals := make([]*models.Log, 0)
+	wals = append(wals,
+		&models.Log{
+			SessionId: sessionId,
+			Message:   models.WALStart,
+		},
+		&models.Log{
+			SessionId: sessionId,
+			Message:   models.WALUpdate,
+			Record:    trx.GetTransaction().GetReceiver(),
+			NewValue:  int(trx.GetTransaction().GetAmount()),
+		},
+	)
+
+	// store the logs
+	if err := h.Storage.InsertBatchLogs(wals); err != nil {
+		h.Logger.Warn("failed to store logs", zap.Error(err))
+		return
+	}
+
+	// insert transaction
+	if err := h.Storage.InsertTransaction(&models.Transaction{
+		Sender:    trx.GetTransaction().GetSender(),
+		Receiver:  trx.GetTransaction().GetReceiver(),
+		Amount:    int(trx.GetTransaction().GetAmount()),
+		SessionId: sessionId,
+	}); err != nil {
+		h.Logger.Warn("failed to store transaction", zap.Error(err))
+	}
+
+	// get the receiver balance
+	balance, err := h.Storage.GetClientBalance(trx.GetTransaction().GetReceiver())
+	if err != nil {
+		h.Logger.Warn("failed to get client balance", zap.Error(err))
+		return
+	}
+
+	// set commit or abort
+	var msg string
+	if trx.GetTransaction().GetAmount() <= int64(balance) {
+		msg = "commit"
+	} else {
+		msg = "abort"
+	}
+
+	// callback the coordinator
+	if err := network.Reply(trx.GetReturnAddress(), msg, sessionId); err != nil {
+		h.Logger.Warn("failed to call the coordinator", zap.Error(err))
+	}
+}
+
+func (h *Handler) reply(payload interface{}) {
+	// get reply message
+	msg := payload.(*database.ReplyMsg)
+
+	// get sessionId
+	sessionId := int(msg.GetSessionId())
+
+	// check for commit or abort
+	var ctx context.Context
+	if msg.GetText() == "abort" {
+		ctx = context.WithValue(
+			context.WithValue(
+				context.Background(),
+				"method",
+				"abort",
+			),
+			"request",
+			&database.AbortMsg{
+				SessionId:     msg.SessionId,
+				ReturnAddress: "",
+			},
+		)
+	} else if msg.GetText() == "commit" {
+		// get transaction
+		trx, err := h.Storage.GetTransaction(sessionId)
+		if err != nil {
+			h.Logger.Error("failed to get transaction", zap.Error(err))
+			return
+		}
+
+		// insert locks
+		if err := h.Storage.InsertLock(trx.Sender); err != nil {
+			h.Logger.Warn("failed to stores locks", zap.Int("session id", sessionId))
+		}
+
+		// insert logs
+		wals := make([]*models.Log, 0)
+		wals = append(wals,
+			&models.Log{
+				SessionId: sessionId,
+				Message:   models.WALStart,
+			},
+			&models.Log{
+				SessionId: sessionId,
+				Message:   models.WALUpdate,
+				Record:    trx.Sender,
+				NewValue:  -1 * trx.Amount,
+			},
+		)
+
+		// store the logs
+		if err := h.Storage.InsertBatchLogs(wals); err != nil {
+			h.Logger.Warn("failed to store logs", zap.Error(err))
+			return
+		}
+
+		// get the sender balance
+		balance, err := h.Storage.GetClientBalance(trx.Sender)
+		if err != nil {
+			h.Logger.Warn("failed to get client balance", zap.Error(err))
+			return
+		}
+
+		// call commit or abort
+		if int64(trx.Amount) <= int64(balance) {
+			ctx = context.WithValue(
+				context.WithValue(
+					context.Background(),
+					"method",
+					"commit",
+				),
+				"request",
+				&database.CommitMsg{
+					SessionId:     int64(sessionId),
+					ReturnAddress: "",
+				},
+			)
+		} else {
+			ctx = context.WithValue(
+				context.WithValue(
+					context.Background(),
+					"method",
+					"abort",
+				),
+				"request",
+				&database.AbortMsg{
+					SessionId:     int64(sessionId),
+					ReturnAddress: "",
+				},
+			)
+		}
+	}
+
+	// callback the cluster
+	if ctx.Value("method").(string) == "abort" {
+		// call abort
+		if err := network.Abort("", "", sessionId); err != nil {
+			h.Logger.Warn("failed to call the participant", zap.Error(err))
+		}
+	} else if ctx.Value("method").(string) == "commit" {
+		// call commit
+		if err := network.Commit("", "", sessionId); err != nil {
+			h.Logger.Warn("failed to call the participant", zap.Error(err))
+		}
+	}
+
+	// reconcile the context again
+	h.Queue <- ctx
 }
 
 func (h *Handler) abort(payload interface{}) {

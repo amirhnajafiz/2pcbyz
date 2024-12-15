@@ -15,6 +15,26 @@ func (s *Storage) InsertTransaction(trx *models.Transaction) error {
 	return err
 }
 
+func (s *Storage) GetTransaction(sessionId int) (*models.Transaction, error) {
+	// create a filter to select committeds
+	filter := bson.M{"session_id": sessionId}
+
+	// find all documents that match the filter
+	cursor, err := s.transactions.Find(context.TODO(), filter)
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(context.TODO())
+
+	// decode the results into a slice of Transaction structs
+	var results []*models.Transaction
+	if err = cursor.All(context.TODO(), &results); err != nil {
+		return nil, err
+	}
+
+	return results[0], nil
+}
+
 // GetCommittedTransactions returns the list of committed transactions on the node.
 func (s *Storage) GetCommittedTransactions() ([]*models.Transaction, error) {
 	// create a filter to select committeds

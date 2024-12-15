@@ -17,10 +17,14 @@ type Handler struct {
 	Logger   *zap.Logger
 	Storage  *storage.Storage
 	Queue    chan context.Context
+
+	states map[int]string
 }
 
 // Start consuming messages.
 func (h *Handler) Start() {
+	h.states = make(map[int]string)
+
 	for {
 		// get context messages from queue
 		ctx := <-h.Queue
@@ -34,6 +38,8 @@ func (h *Handler) Start() {
 			h.intershard(payload)
 		case "crosshard":
 			h.crossshard(payload)
+		case "reply":
+			h.reply(payload)
 		case "abort":
 			h.abort(payload)
 		case "commit":
