@@ -10,7 +10,10 @@ import (
 
 // Storage is a module that uses mongo-driver library to handle MongoDB queries.
 type Storage struct {
-	shards *mongo.Collection
+	clients      *mongo.Collection
+	locks        *mongo.Collection
+	logs         *mongo.Collection
+	transactions *mongo.Collection
 }
 
 // NewStorage opens a MongoDB connection and returns an instance of storage struct.
@@ -23,7 +26,10 @@ func NewStorage(uri, database, partition string) (*Storage, error) {
 
 	// create a new instance
 	instance := Storage{
-		shards: conn.Database(database).Collection(fmt.Sprintf("%s_shard", partition)),
+		locks:        conn.Database(database).Collection(fmt.Sprintf("%s_locks", partition)),
+		logs:         conn.Database(database).Collection(fmt.Sprintf("%s_logs", partition)),
+		clients:      conn.Database(database).Collection(fmt.Sprintf("%s_clients", partition)),
+		transactions: conn.Database(database).Collection(fmt.Sprintf("%s_transactions", partition)),
 	}
 
 	return &instance, nil
