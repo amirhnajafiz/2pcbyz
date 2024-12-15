@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/F24-CSE535/2pcbyz/client/internal/network"
 	"github.com/F24-CSE535/2pcbyz/client/pkg/rpc/database"
@@ -42,6 +43,30 @@ func (h *Handler) request(argc int, argv []string) (string, error) {
 	}
 
 	return fmt.Sprintf("transaction %d (%s %s) submitted", session, sender, receiver), nil
+}
+
+// printBalance accepts a client id and gets its balance over all nodes of a cluster.
+func (h *Handler) printBalance(argc int, argv []string) (string, error) {
+	if argc < 1 {
+		return "", errors.New("not enough arguments (client)")
+	}
+
+	client := argv[0]
+
+	// get client shard
+	shard := findClientShard(client, h.cfg.Shards)
+
+	// loop over all nodes inside a cluster and call printbalance
+	output := fmt.Sprintf("client: %s\n", client)
+	for _, svc := range strings.Split(h.ipt.Endpoints[fmt.Sprintf("E%s", shard)], ":") {
+		if amount, err := network.PrintBalance(h.ipt.Services[svc], client); err != nil {
+			return "", err
+		} else {
+			output = fmt.Sprintf("%s- %s: %d\n", output, svc, amount)
+		}
+	}
+
+	return output, nil
 }
 
 // next runs the next testcase.

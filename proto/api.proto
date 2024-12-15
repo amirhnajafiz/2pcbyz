@@ -20,6 +20,9 @@ message PrintBalanceRsp {
 }
 
 message DatastoreRsp {
-  int64 sequence = 1;
-  int64 session_id = 2;
+  string sender = 1;
+  string receiver = 2;
+  int64 amount = 3;
+  int64 session_id = 4;
+  int64 sequence = 5;
 }

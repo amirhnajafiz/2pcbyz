@@ -29,6 +29,7 @@ func NewHandler(cfg *config.Config, ipt *config.IPTable) *Handler {
 
 	// define a handles map to callback function
 	instance.handlers["request"] = instance.request
+	instance.handlers["printbalance"] = instance.printBalance
 	instance.handlers["next"] = instance.next
 	instance.handlers["exit"] = instance.exit
 
