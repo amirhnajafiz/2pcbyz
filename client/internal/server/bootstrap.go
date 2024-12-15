@@ -11,7 +11,7 @@ import (
 )
 
 // ListenAndServe accepts a port and starts a gRPC server.
-func ListenAndServe(port int) error {
+func ListenAndServe(port, limit int, output chan string) error {
 	// on the local network, listen to a port
 	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
 	if err != nil {
@@ -22,7 +22,11 @@ func ListenAndServe(port int) error {
 	srv := grpc.NewServer()
 
 	// register all gRPC services
-	database.RegisterDatabaseServer(srv, &server{})
+	database.RegisterDatabaseServer(srv, &server{
+		limit:  limit,
+		output: output,
+		memory: make(map[int]int),
+	})
 
 	// start gRPC server
 	log.Printf("grpc server started on %d ...\n", port)

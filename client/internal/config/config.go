@@ -11,8 +11,9 @@ import (
 
 // Config struct is a module that stores system configs.
 type Config struct {
-	Port   int           `koanf:"grpc_port"`
-	Shards []ShardConfig `koanf:"shards"` // types.ShardConfig
+	ResponseLimit int           `koanf:"response_limit"`
+	Port          int           `koanf:"grpc_port"`
+	Shards        []ShardConfig `koanf:"shards"` // types.ShardConfig
 }
 
 // New reads configuration with koanf, by loading a yaml config path into the Config struct.

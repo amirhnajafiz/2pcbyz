@@ -2,8 +2,9 @@ package config
 
 func Default() Config {
 	return Config{
-		Port:   5001,
-		Shards: make([]ShardConfig, 0),
+		ResponseLimit: 0,
+		Port:          5001,
+		Shards:        make([]ShardConfig, 0),
 	}
 }
 

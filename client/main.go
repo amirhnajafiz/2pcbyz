@@ -35,7 +35,16 @@ func main() {
 	}
 
 	// run a gRPC server
-	go server.ListenAndServe(cfg.Port)
+	ch := make(chan string)
+	go server.ListenAndServe(cfg.Port, cfg.ResponseLimit, ch)
+
+	// create a go-routine to print the server output messages
+	go func() {
+		for {
+			txt := <-ch
+			fmt.Println(txt)
+		}
+	}()
 
 	// in a for loop, read user commands
 	reader := bufio.NewReader(os.Stdin)
