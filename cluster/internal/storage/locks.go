@@ -16,3 +16,13 @@ func (s *Storage) InsertLock(record string) error {
 
 	return err
 }
+
+// ReleaseLock unlocks a captured lock.
+func (s *Storage) ReleaseLock(record string) error {
+	_, err := s.locks.InsertOne(context.TODO(), &models.Lock{
+		Record:    record,
+		DeletedAt: time.Now().String(),
+	})
+
+	return err
+}
