@@ -32,7 +32,7 @@ func (h *Handler) request(argc int, argv []string) (string, error) {
 
 	// check availability
 	if h.lives[sshard]-h.byzantines[sshard] < 2 || h.lives[cshard]-h.byzantines[cshard] < 2 {
-		return "", fmt.Errorf("not enough servers to process the transaction")
+		return "not enough servers to process the transaction", nil
 	}
 
 	// call request RPC
@@ -106,7 +106,7 @@ func (h *Handler) next(_ int, _ []string) (string, error) {
 
 	list := []string{"C1", "C2", "C3"}
 	for _, item := range list {
-		h.lives[item] = 4
+		h.lives[item] = 0
 		h.byzantines[item] = 0
 	}
 
@@ -126,7 +126,7 @@ func (h *Handler) next(_ int, _ []string) (string, error) {
 		for _, cluster := range list {
 			for _, tmp := range strings.Split(h.ipt.Endpoints[fmt.Sprintf("E%s", cluster)], ":") {
 				if svc == tmp {
-					h.lives[cluster]--
+					h.lives[cluster]++
 				}
 			}
 		}
