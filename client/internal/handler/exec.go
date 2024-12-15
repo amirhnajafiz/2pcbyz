@@ -32,7 +32,7 @@ func (h *Handler) request(argc int, argv []string) (string, error) {
 
 	// check availability
 	if h.lives[sshard]-h.byzantines[sshard] < 2 || h.lives[cshard]-h.byzantines[cshard] < 2 {
-		return "not enough servers to process the transaction", nil
+		return fmt.Sprintf("%d: not enough servers to process the transaction", session), nil
 	}
 
 	// call request RPC
@@ -48,7 +48,7 @@ func (h *Handler) request(argc int, argv []string) (string, error) {
 		return "", fmt.Errorf("rpc failed: %v", err)
 	}
 
-	return fmt.Sprintf("transaction %d (%s %s) submitted", session, sender, receiver), nil
+	return fmt.Sprintf("transaction %d (%s %s %d) submitted", session, sender, receiver, amount), nil
 }
 
 // printBalance accepts a client id and gets its balance over all nodes of a cluster.
