@@ -3,15 +3,21 @@ package pbft
 import (
 	"context"
 
+	"github.com/F24-CSE535/2pcbyz/cluster/internal/config"
+
 	"go.uber.org/zap"
 )
 
 // StateMachine runs PBFT protocol.
 type StateMachine struct {
+	Port      int
+	Cluster   string
+	Ipt       *config.IPTable
 	Consensus chan context.Context
 	Queue     chan context.Context
 	Logger    *zap.Logger
 
+	sequence  int
 	block     bool
 	byzantine bool
 }
@@ -19,6 +25,7 @@ type StateMachine struct {
 func (sm *StateMachine) Start() {
 	sm.block = false
 	sm.byzantine = false
+	sm.sequence = 0
 
 	for {
 		// get context messages from queue

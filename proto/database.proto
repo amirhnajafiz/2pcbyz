@@ -21,6 +21,7 @@ message TransactionMsg {
   string receiver = 2;
   int64 amount = 3;
   int64 session_id = 4;
+  int64 sequence = 5;
 }
 
 // request is used for inter-shard transactions.

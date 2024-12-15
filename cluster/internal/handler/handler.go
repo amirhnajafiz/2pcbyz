@@ -35,6 +35,8 @@ func (h *Handler) Start() {
 		// map of method to handler
 		switch ctx.Value("method").(string) {
 		case "request":
+			h.Consensus <- ctx
+		case "begin":
 			h.begin(payload)
 		case "intershard":
 			h.intershard(payload)

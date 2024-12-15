@@ -22,6 +22,7 @@ message TransactionMsg {
   string return_address = 3;
   int64 amount = 4;
   int64 session_id = 5;
+  int64 sequence = 6;
 }
 
 // preprepare is sent by the leader to all other nodes to start PBFT.
