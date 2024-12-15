@@ -13,8 +13,9 @@ func Default() Config {
 			Database: "C0",
 		},
 		Shard: ShardConfig{
-			Name:  "D0",
-			Range: make([]int, 0),
+			Name: "D0",
+			From: 0,
+			To:   0,
 		},
 		Replicas: []ReplicaConfig{},
 	}

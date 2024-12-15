@@ -52,6 +52,16 @@ func main() {
 				return
 			}
 
+			// update shards of the node
+			if err := stg.DeleteShards(); err != nil {
+				log.Fatal(err)
+				return
+			}
+			if err := stg.InsertShards(cfg.Shard.From, cfg.Shard.To); err != nil {
+				log.Fatal(err)
+				return
+			}
+
 			// create a handler queue
 			queue := make(chan context.Context, cfg.Handler.QueueSize)
 
