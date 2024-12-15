@@ -2,7 +2,7 @@ package config
 
 func Default() Config {
 	return Config{
-		LogLevel: "error",
+		LogLevel: "debug",
 		Name:     "C0",
 		Handler: HandlerConfig{
 			Instances: 0,

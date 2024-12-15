@@ -23,7 +23,7 @@ func (h *Handler) Start() {
 		payload := ctx.Value("request")
 
 		// map of method to handler
-		switch ctx.Value("method") {
+		switch ctx.Value("method").(string) {
 		case "request":
 			h.request(payload)
 		case "abort":
