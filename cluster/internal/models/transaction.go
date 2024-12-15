@@ -12,5 +12,6 @@ type Transaction struct {
 	Receiver  string `bson:"receiver"`
 	Amount    int    `bson:"amount"`
 	SessionId int    `bson:"session_id"`
+	Sequence  int    `bson:"sequence"`
 	Status    string `bson:"status"`
 }

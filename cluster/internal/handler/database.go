@@ -19,6 +19,7 @@ func (h *Handler) begin(payload interface{}) {
 		Receiver:  trx.GetTransaction().GetReceiver(),
 		Amount:    int(trx.GetTransaction().GetAmount()),
 		SessionId: int(trx.GetTransaction().GetSessionId()),
+		Sequence:  int(trx.GetTransaction().GetSequence()),
 	}); err != nil {
 		h.Logger.Warn("failed to store transaction", zap.Error(err))
 	}
@@ -173,6 +174,7 @@ func (h *Handler) prepare(payload interface{}) {
 		Receiver:  trx.GetTransaction().GetReceiver(),
 		Amount:    int(trx.GetTransaction().GetAmount()),
 		SessionId: sessionId,
+		Sequence:  int(trx.GetTransaction().GetSequence()),
 	}); err != nil {
 		h.Logger.Warn("failed to store transaction", zap.Error(err))
 	}

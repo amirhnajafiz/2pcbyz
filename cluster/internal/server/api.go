@@ -41,6 +41,7 @@ func (a *API) PrintDatastore(_ *emptypb.Empty, stream api.API_PrintDatastoreServ
 			Receiver:  trx.Receiver,
 			Amount:    int64(trx.Amount),
 			SessionId: int64(trx.SessionId),
+			Sequence:  int64(trx.Sequence),
 		}); err != nil {
 			return err
 		}
