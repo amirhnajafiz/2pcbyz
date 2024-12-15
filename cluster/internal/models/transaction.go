@@ -1,5 +1,11 @@
 package models
 
+// list of system's transaction's status
+const (
+	StsCommit = "commit"
+	StsAbort  = "abort"
+)
+
 // Transaction is a bson model to store the client requests.
 type Transaction struct {
 	Sender    string `bson:"sender"`

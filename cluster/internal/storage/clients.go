@@ -15,11 +15,8 @@ func (s *Storage) DeleteShards() error {
 
 	// delete all existing shards
 	_, err := s.clients.DeleteMany(context.TODO(), filter)
-	if err != nil {
-		return err
-	}
 
-	return nil
+	return err
 }
 
 // InsertShards creates client's records for the node.
