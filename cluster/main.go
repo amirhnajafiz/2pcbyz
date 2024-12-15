@@ -32,6 +32,8 @@ func main() {
 		// add one value to wait-group
 		wg.Add(1)
 
+		log.Printf("starting replica: %s on %d\n", replica.Name, replica.Port)
+
 		// start a go-routine
 		go func(name string, port int) {
 			defer func() {
@@ -96,5 +98,6 @@ func main() {
 	}
 
 	// wait for all replicas
+	fmt.Printf("total %d replicas running. see logs.\n", len(cfg.Replicas))
 	wg.Wait()
 }
