@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/F24-CSE535/2pcbyz/cluster/internal/config"
+	"github.com/F24-CSE535/2pcbyz/cluster/internal/pbft/memory"
 
 	"go.uber.org/zap"
 )
@@ -19,12 +20,14 @@ type StateMachine struct {
 	sequence  int
 	block     bool
 	byzantine bool
+	memory    *memory.SharedMemory
 }
 
 func (sm *StateMachine) Start() {
 	sm.block = false
 	sm.byzantine = false
 	sm.sequence = 0
+	sm.memory = memory.NewSharedMemory()
 
 	for {
 		// get context messages from queue
@@ -38,6 +41,8 @@ func (sm *StateMachine) Start() {
 		switch ctx.Value("method").(string) {
 		case "request":
 			err = sm.request(payload)
+		case "input":
+			err = sm.input(payload)
 		case "preprepare":
 			err = sm.prePrepare(payload)
 		case "ackpreprepare":
@@ -48,6 +53,8 @@ func (sm *StateMachine) Start() {
 			err = sm.ackPrepare(payload)
 		case "commit":
 			err = sm.commit(payload)
+		case "timeout":
+			err = sm.timeout(payload)
 		case "block":
 			sm.block = true
 		case "unblock":
