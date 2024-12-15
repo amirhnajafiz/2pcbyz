@@ -22,7 +22,7 @@ func (sm *StateMachine) request(payload interface{}) error {
 
 	// call preprepare on all
 	for _, svc := range strings.Split(sm.Ipt.Endpoints[fmt.Sprintf("E%s", sm.Cluster)], ":") {
-		if err := network.PrePrepare(svc, &pbft.PrePrepareMsg{
+		if err := network.PrePrepare(sm.Ipt.Services[svc], &pbft.PrePrepareMsg{
 			Transaction: &pbft.TransactionMsg{
 				Sender:        trx.GetTransaction().GetSender(),
 				Receiver:      trx.GetTransaction().GetReceiver(),

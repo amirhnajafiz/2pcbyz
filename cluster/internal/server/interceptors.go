@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"fmt"
 
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -40,6 +41,8 @@ func (b *Bootstrap) checkEmptyReturnCallsInterceptor(
 	// parse to get service and method
 	if svc, method, err := parseFullMethod(info.FullMethod); err == nil {
 		ctx := context.WithValue(context.WithValue(context.Background(), "method", method), "request", req)
+
+		fmt.Println(svc)
 
 		// if the service is database or pbft, it is an empty return call
 		if svc == "databaseDatabase" {

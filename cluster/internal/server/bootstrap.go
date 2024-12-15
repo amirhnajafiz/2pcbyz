@@ -8,6 +8,7 @@ import (
 	"github.com/F24-CSE535/2pcbyz/cluster/internal/storage"
 	"github.com/F24-CSE535/2pcbyz/cluster/pkg/rpc/api"
 	"github.com/F24-CSE535/2pcbyz/cluster/pkg/rpc/database"
+	"github.com/F24-CSE535/2pcbyz/cluster/pkg/rpc/pbft"
 
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -38,6 +39,7 @@ func (b *Bootstrap) ListenAndServe() error {
 
 	// register all gRPC services
 	database.RegisterDatabaseServer(server, database.UnimplementedDatabaseServer{})
+	pbft.RegisterPBFTServer(server, pbft.UnimplementedPBFTServer{})
 	api.RegisterAPIServer(server, &API{
 		storage: b.Storage,
 	})
