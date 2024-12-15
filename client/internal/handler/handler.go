@@ -15,16 +15,21 @@ type Handler struct {
 	ipt      *config.IPTable
 	handlers map[string]func(int, []string) (string, error)
 	tests    []map[string]interface{}
+
+	lives      map[string]int
+	byzantines map[string]int
 }
 
 // NewHandler returns a handler instance.
 func NewHandler(cfg *config.Config, ipt *config.IPTable) *Handler {
 	instance := &Handler{
-		session:  int(time.Now().Unix()),
-		index:    0,
-		cfg:      cfg,
-		ipt:      ipt,
-		handlers: make(map[string]func(int, []string) (string, error)),
+		session:    int(time.Now().Unix()),
+		index:      0,
+		cfg:        cfg,
+		ipt:        ipt,
+		handlers:   make(map[string]func(int, []string) (string, error)),
+		lives:      make(map[string]int),
+		byzantines: make(map[string]int),
 	}
 
 	// define a handles map to callback function

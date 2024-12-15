@@ -27,10 +27,16 @@ func (h *Handler) request(argc int, argv []string) (string, error) {
 	h.session++
 
 	// find the clinet shard
-	shard := findClientShard(sender, h.cfg.Shards)
+	sshard := findClientShard(sender, h.cfg.Shards)
+	cshard := findClientShard(receiver, h.cfg.Shards)
+
+	// check availability
+	if h.lives[sshard]-h.byzantines[sshard] < 2 || h.lives[cshard]-h.byzantines[cshard] < 2 {
+		return "", fmt.Errorf("not enough servers to process the transaction")
+	}
 
 	// call request RPC
-	if err := network.Request(h.ipt.Services[h.ipt.Endpoints[shard]], &database.RequestMsg{
+	if err := network.Request(h.ipt.Services[h.ipt.Endpoints[sshard]], &database.RequestMsg{
 		Transaction: &database.TransactionMsg{ // create a new transaction
 			Sender:    sender,
 			Receiver:  receiver,
@@ -98,6 +104,12 @@ func (h *Handler) next(_ int, _ []string) (string, error) {
 		return "end of tests", nil
 	}
 
+	list := []string{"C1", "C2", "C3"}
+	for _, item := range list {
+		h.lives[item] = 4
+		h.byzantines[item] = 0
+	}
+
 	// block all servers
 	for _, svc := range strings.Split(h.ipt.Endpoints["all"], ":") {
 		network.Block(h.ipt.Services[svc])
@@ -110,11 +122,27 @@ func (h *Handler) next(_ int, _ []string) (string, error) {
 	for _, svc := range h.tests[h.index]["servers"].([]string) {
 		network.Unblock(h.ipt.Services[svc])
 		output = fmt.Sprintf("%s%s ", output, svc)
+
+		for _, cluster := range list {
+			for _, tmp := range strings.Split(h.ipt.Endpoints[fmt.Sprintf("E%s", cluster)], ":") {
+				if svc == tmp {
+					h.lives[cluster]--
+				}
+			}
+		}
 	}
 	output = output + "live servers:\n"
 	for _, svc := range h.tests[h.index]["byzantines"].([]string) {
 		network.Byzantine(h.ipt.Services[svc])
 		output = fmt.Sprintf("%s%s ", output, svc)
+
+		for _, cluster := range list {
+			for _, tmp := range strings.Split(h.ipt.Endpoints[fmt.Sprintf("E%s", cluster)], ":") {
+				if svc == tmp {
+					h.byzantines[cluster]++
+				}
+			}
+		}
 	}
 	output = output + "byzantine servers:\n"
 
