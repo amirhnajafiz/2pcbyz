@@ -53,6 +53,8 @@ func (h *Handler) Start() {
 		ctx := <-h.Queue
 		payload := ctx.Value("request")
 
+		h.Logger.Debug("input request", zap.String("method", ctx.Value("method").(string)))
+
 		// map of method to handler
 		switch ctx.Value("method").(string) {
 		case "begin":
@@ -72,5 +74,7 @@ func (h *Handler) Start() {
 		case "commit":
 			h.commit(payload)
 		}
+
+		h.Logger.Debug("done", zap.String("method", ctx.Value("method").(string)))
 	}
 }

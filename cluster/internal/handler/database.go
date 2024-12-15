@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"time"
+
 	"github.com/F24-CSE535/2pcbyz/cluster/internal/models"
 	"github.com/F24-CSE535/2pcbyz/cluster/internal/network"
 	"github.com/F24-CSE535/2pcbyz/cluster/pkg/rpc/database"
@@ -318,7 +320,11 @@ func (h *Handler) reply(payload interface{}) {
 
 func (h *Handler) abort(payload interface{}) {
 	defer func() {
-		h.notify <- nil
+		go func() {
+			h.notify <- nil
+		}()
+
+		time.Sleep(1 * time.Second)
 	}()
 
 	// get transaction
@@ -348,7 +354,11 @@ func (h *Handler) abort(payload interface{}) {
 
 func (h *Handler) commit(payload interface{}) {
 	defer func() {
-		h.notify <- nil
+		go func() {
+			h.notify <- nil
+		}()
+
+		time.Sleep(1 * time.Second)
 	}()
 
 	// get transaction
