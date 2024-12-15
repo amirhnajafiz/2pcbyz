@@ -70,7 +70,7 @@ func CSVParseTestcaseFile(path string) ([]map[string]interface{}, error) {
 					servers = append(servers, item)
 				}
 			}
-			tmpB := append(servers, strings.Split(strings.Replace(strings.Replace(row[4], "[", "", -1), "]", "", -1), ", ")...)
+			tmpB := append(byzantines, strings.Split(strings.Replace(strings.Replace(row[4], "[", "", -1), "]", "", -1), ", ")...)
 			for _, item := range tmpB {
 				if item != "" {
 					byzantines = append(byzantines, item)
