@@ -9,7 +9,45 @@ import (
 	"golang.org/x/net/context"
 )
 
-func (h *Handler) request(payload interface{}) {
+func (h *Handler) begin(payload interface{}) {
+	// get transaction
+	trx := payload.(*database.RequestMsg)
+
+	// get both shards
+	sshard := findClientShard(trx.GetTransaction().GetSender(), h.Cfg.Shards)
+	rshard := findClientShard(trx.GetTransaction().GetReceiver(), h.Cfg.Shards)
+
+	// check transaction type
+	var ctx context.Context
+	if sshard == rshard {
+		// call inter-shard
+		ctx = context.WithValue(
+			context.WithValue(
+				context.Background(),
+				"method",
+				"intershard",
+			),
+			"request",
+			trx,
+		)
+	} else {
+		// call cross-shard
+		ctx = context.WithValue(
+			context.WithValue(
+				context.Background(),
+				"method",
+				"crossshard",
+			),
+			"request",
+			trx,
+		)
+	}
+
+	// reconcile the context again
+	h.Queue <- ctx
+}
+
+func (h *Handler) intershard(payload interface{}) {
 	// get transaction
 	trx := payload.(*database.RequestMsg)
 
@@ -100,6 +138,10 @@ func (h *Handler) request(payload interface{}) {
 
 	// reconcile the context again
 	h.Queue <- ctx
+}
+
+func (h *Handler) crossshard(payload interface{}) {
+
 }
 
 func (h *Handler) abort(payload interface{}) {

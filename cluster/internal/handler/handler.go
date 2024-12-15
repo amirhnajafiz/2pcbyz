@@ -11,10 +11,12 @@ import (
 
 // Handler is a process that gets requests from gRPC module and executes sub-handlers based on the input request.
 type Handler struct {
-	Cfg     *config.Config
-	Logger  *zap.Logger
-	Storage *storage.Storage
-	Queue   chan context.Context
+	Sequence int
+	Cfg      *config.Config
+	Ipt      *config.IPTable
+	Logger   *zap.Logger
+	Storage  *storage.Storage
+	Queue    chan context.Context
 }
 
 // Start consuming messages.
@@ -27,7 +29,11 @@ func (h *Handler) Start() {
 		// map of method to handler
 		switch ctx.Value("method").(string) {
 		case "request":
-			h.request(payload)
+			h.begin(payload)
+		case "intershard":
+			h.intershard(payload)
+		case "crosshard":
+			h.crossshard(payload)
 		case "abort":
 			h.abort(payload)
 		case "commit":

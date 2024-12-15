@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"sync"
+	"time"
 
 	"github.com/F24-CSE535/2pcbyz/cluster/internal/config"
 	"github.com/F24-CSE535/2pcbyz/cluster/internal/handler"
@@ -23,8 +24,8 @@ func main() {
 	// load config file
 	cfg := config.New(args[1])
 
-	// load iptable
-	_ = config.NewIPTable(args[2])
+	// load iptable file
+	ipt := config.NewIPTable(args[2])
 
 	// create replicas based on the information provided in config
 	wg := sync.WaitGroup{}
@@ -69,10 +70,12 @@ func main() {
 
 			// create a new handler instance
 			hdl := handler.Handler{
-				Cfg:     &cfg,
-				Logger:  logr.Named("handler"),
-				Storage: stg,
-				Queue:   queue,
+				Sequence: int(time.Now().Unix()),
+				Cfg:      &cfg,
+				Ipt:      &ipt,
+				Logger:   logr.Named("handler"),
+				Storage:  stg,
+				Queue:    queue,
 			}
 
 			// start the handler instances in a go-routine
