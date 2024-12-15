@@ -16,8 +16,8 @@ type IPTable struct {
 }
 
 // NewIPTable reads an iptable file inside a IPTable instance.
-func NewIPTable(path string) Config {
-	var instance Config
+func NewIPTable(path string) IPTable {
+	var instance IPTable
 
 	k := koanf.New(".")
 
