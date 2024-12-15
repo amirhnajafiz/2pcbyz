@@ -31,7 +31,7 @@ func (h *Handler) request(argc int, argv []string) (string, error) {
 	cshard := findClientShard(receiver, h.cfg.Shards)
 
 	// check availability
-	if h.lives[sshard]-h.byzantines[sshard] < 2 || h.lives[cshard]-h.byzantines[cshard] < 2 {
+	if h.lives[sshard]-h.byzantines[sshard] < 3 || h.lives[cshard]-h.byzantines[cshard] < 3 {
 		return fmt.Sprintf("%d: not enough servers to process the transaction", session), nil
 	}
 
