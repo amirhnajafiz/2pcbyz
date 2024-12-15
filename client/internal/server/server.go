@@ -37,7 +37,7 @@ func (s *server) Reply(_ context.Context, msg *database.ReplyMsg) (*emptypb.Empt
 
 	// check the limit, if there are enough responses, return the response to user
 	if s.memory[sid] >= s.limit {
-		s.output <- fmt.Sprintf("%d: %s", msg.GetSessionId(), msg.GetText())
+		s.output <- fmt.Sprintf("\t- transaction %d: %s", msg.GetSessionId(), msg.GetText())
 		s.memory[sid] = -12
 	}
 

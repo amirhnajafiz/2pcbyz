@@ -68,7 +68,7 @@ func (h *Handler) printBalance(argc int, argv []string) (string, error) {
 		if amount, err := network.PrintBalance(h.ipt.Services[svc], client); err != nil {
 			return "", err
 		} else {
-			output = fmt.Sprintf("%s- %s: %d\n", output, svc, amount)
+			output = fmt.Sprintf("%s\t- %s: %d\n", output, svc, amount)
 		}
 	}
 
@@ -119,11 +119,8 @@ func (h *Handler) next(_ int, _ []string) (string, error) {
 	output := fmt.Sprintf("test set %d:\n", h.index+1)
 
 	// update servers status
-	output = output + "live servers:\n"
 	for _, svc := range h.tests[h.index]["servers"].([]string) {
 		network.Unblock(h.ipt.Services[svc])
-		output = fmt.Sprintf("%s%s ", output, svc)
-
 		for _, cluster := range list {
 			for _, tmp := range strings.Split(h.ipt.Endpoints[fmt.Sprintf("E%s", cluster)], ":") {
 				if svc == tmp {
@@ -133,11 +130,8 @@ func (h *Handler) next(_ int, _ []string) (string, error) {
 		}
 	}
 
-	output = output + "\nbyzantine servers:\n"
 	for _, svc := range h.tests[h.index]["byzantines"].([]string) {
 		network.Byzantine(h.ipt.Services[svc])
-		output = fmt.Sprintf("%s%s ", output, svc)
-
 		for _, cluster := range list {
 			for _, tmp := range strings.Split(h.ipt.Endpoints[fmt.Sprintf("E%s", cluster)], ":") {
 				if svc == tmp {
@@ -147,14 +141,12 @@ func (h *Handler) next(_ int, _ []string) (string, error) {
 		}
 	}
 
-	output = output + "\n"
-
 	// make transactions by calling the handler request
 	for _, trx := range h.tests[h.index]["transactions"].([][]string) {
 		if msg, err := h.request(3, trx); err != nil {
 			return "", err
 		} else {
-			output = fmt.Sprintf("%s%s\n", output, msg)
+			output = fmt.Sprintf("%s\t- %s\n", output, msg)
 		}
 	}
 
