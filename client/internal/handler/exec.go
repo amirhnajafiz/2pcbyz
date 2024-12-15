@@ -133,7 +133,7 @@ func (h *Handler) next(_ int, _ []string) (string, error) {
 		}
 	}
 
-	output = output + "byzantine servers:\n"
+	output = output + "\nbyzantine servers:\n"
 	for _, svc := range h.tests[h.index]["byzantines"].([]string) {
 		network.Byzantine(h.ipt.Services[svc])
 		output = fmt.Sprintf("%s%s ", output, svc)
@@ -146,6 +146,8 @@ func (h *Handler) next(_ int, _ []string) (string, error) {
 			}
 		}
 	}
+
+	output = output + "\n"
 
 	// make transactions by calling the handler request
 	for _, trx := range h.tests[h.index]["transactions"].([][]string) {
