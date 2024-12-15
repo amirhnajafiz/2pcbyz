@@ -20,7 +20,7 @@ func NewLogger(level, out string) *zap.Logger {
 	}
 
 	// open `out` file for logs export
-	file, err := os.OpenFile(out, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	file, err := os.OpenFile(out, os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		return nil
 	}
