@@ -14,6 +14,10 @@ func (s *Storage) InsertLock(record string) error {
 		DeletedAt: time.Now().String(),
 	})
 
+	if err := s.WaitOnLock(); err != nil {
+		return err
+	}
+
 	return err
 }
 
@@ -25,4 +29,9 @@ func (s *Storage) ReleaseLock(record string) error {
 	})
 
 	return err
+}
+
+// WaitOnLock blocks a request until a new request is fetched.
+func (s *Storage) WaitOnLock() error {
+	return nil
 }
