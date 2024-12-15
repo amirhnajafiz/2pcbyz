@@ -46,7 +46,6 @@ message PrePrepareAck {
   string node_id = 2;
   int64 sequence = 3;
   int64 view = 4;
-  bytes sign = 5;
 }
 
 // preprepare is sent by the leader to all other nodes to start prepare.
@@ -56,7 +55,6 @@ message PrepareMsg {
   string node_id = 2;
   int64 sequence = 3;
   int64 view = 4;
-  repeated bytes signs = 5;
 }
 
 // prepare ack is sent by other nodes to the leader to follow prepare.
@@ -67,7 +65,6 @@ message PrepareAck {
   string node_id = 2;
   int64 sequence = 3;
   int64 view = 4;
-  bytes sign = 5;
 }
 
 // commit is sent by the leader to other nodes to finish PBFT.
@@ -77,5 +74,4 @@ message CommitMsg {
   string node_id = 2;
   int64 sequence = 3;
   int64 view = 4;
-  repeated bytes signs = 5;
 }
