@@ -6,13 +6,20 @@ import (
 	"go.uber.org/zap"
 )
 
+// StateMachine runs PBFT protocol.
 type StateMachine struct {
 	Consensus chan context.Context
 	Queue     chan context.Context
 	Logger    *zap.Logger
+
+	block     bool
+	byzantine bool
 }
 
 func (sm *StateMachine) Start() {
+	sm.block = false
+	sm.byzantine = false
+
 	for {
 		// get context messages from queue
 		ctx := <-sm.Consensus
@@ -35,6 +42,14 @@ func (sm *StateMachine) Start() {
 			err = sm.ackPrepare(payload)
 		case "commit":
 			err = sm.commit(payload)
+		case "block":
+			sm.block = true
+		case "unblock":
+			sm.block = false
+		case "byzantine":
+			sm.byzantine = true
+		case "nonbyzantine":
+			sm.byzantine = false
 		default:
 			sm.Queue <- ctx
 		}
