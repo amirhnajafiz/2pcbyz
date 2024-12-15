@@ -71,6 +71,7 @@ func main() {
 			// create a new handler instance
 			hdl := handler.Handler{
 				Sequence: int(time.Now().Unix()),
+				Port:     port,
 				Cfg:      &cfg,
 				Ipt:      &ipt,
 				Logger:   logr.Named("handler"),

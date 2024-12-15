@@ -27,12 +27,15 @@ message TransactionMsg {
 message RequestMsg {
   TransactionMsg transaction = 1;
   string return_address = 2;
+  string coordinator_address = 3;
 }
 
 // reply is used for returning a response to the client.
 message ReplyMsg {
   int64 session_id = 1;
   string text = 2;
+  string return_address = 3;
+  string participant_address = 4;
 }
 
 // prepare is used in the first phase of 2pc.

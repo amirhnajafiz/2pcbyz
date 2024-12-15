@@ -41,6 +41,8 @@ func (h *Handler) begin(payload interface{}) {
 			trx,
 		)
 	} else {
+		trx.CoordinatorAddress = localAddress(h.Port)
+
 		// call cross-shard
 		ctx = context.WithValue(
 			context.WithValue(
@@ -199,7 +201,7 @@ func (h *Handler) crossshard(payload interface{}) {
 	}
 
 	// callback the coordinator
-	if err := network.Reply(trx.GetReturnAddress(), msg, sessionId); err != nil {
+	if err := network.Reply(trx.CoordinatorAddress, trx.ReturnAddress, localAddress(h.Port), msg, sessionId); err != nil {
 		h.Logger.Warn("failed to call the coordinator", zap.Error(err))
 	}
 }
@@ -223,7 +225,7 @@ func (h *Handler) reply(payload interface{}) {
 			"request",
 			&database.AbortMsg{
 				SessionId:     msg.SessionId,
-				ReturnAddress: "",
+				ReturnAddress: msg.GetReturnAddress(),
 			},
 		)
 	} else if msg.GetText() == "commit" {
@@ -278,7 +280,7 @@ func (h *Handler) reply(payload interface{}) {
 				"request",
 				&database.CommitMsg{
 					SessionId:     int64(sessionId),
-					ReturnAddress: "",
+					ReturnAddress: msg.GetReturnAddress(),
 				},
 			)
 		} else {
@@ -291,7 +293,7 @@ func (h *Handler) reply(payload interface{}) {
 				"request",
 				&database.AbortMsg{
 					SessionId:     int64(sessionId),
-					ReturnAddress: "",
+					ReturnAddress: msg.GetReturnAddress(),
 				},
 			)
 		}
@@ -300,12 +302,12 @@ func (h *Handler) reply(payload interface{}) {
 	// callback the cluster
 	if ctx.Value("method").(string) == "abort" {
 		// call abort
-		if err := network.Abort("", "", sessionId); err != nil {
+		if err := network.Abort(msg.GetParticipantAddress(), msg.GetReturnAddress(), sessionId); err != nil {
 			h.Logger.Warn("failed to call the participant", zap.Error(err))
 		}
 	} else if ctx.Value("method").(string) == "commit" {
 		// call commit
-		if err := network.Commit("", "", sessionId); err != nil {
+		if err := network.Commit(msg.GetParticipantAddress(), msg.GetReturnAddress(), sessionId); err != nil {
 			h.Logger.Warn("failed to call the participant", zap.Error(err))
 		}
 	}
@@ -335,7 +337,7 @@ func (h *Handler) abort(payload interface{}) {
 	}
 
 	// reply back to the user
-	if err := network.Reply(trx.GetReturnAddress(), "FAIL", sessionId); err != nil {
+	if err := network.Reply(trx.GetReturnAddress(), "", "", "FAIL", sessionId); err != nil {
 		h.Logger.Warn("failed to send reply", zap.Error(err))
 	}
 }
@@ -377,7 +379,7 @@ func (h *Handler) commit(payload interface{}) {
 	}
 
 	// reply back to the user
-	if err := network.Reply(trx.GetReturnAddress(), "OK", sessionId); err != nil {
+	if err := network.Reply(trx.GetReturnAddress(), "", "", "OK", sessionId); err != nil {
 		h.Logger.Warn("failed to send reply", zap.Error(err))
 	}
 }

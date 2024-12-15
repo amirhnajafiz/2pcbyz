@@ -21,7 +21,7 @@ func connect(address string) (*grpc.ClientConn, error) {
 }
 
 // Reply calls the reply RPC on the client.
-func Reply(address, text string, sessionId int) error {
+func Reply(address, raddress, paddress, text string, sessionId int) error {
 	// base connection
 	conn, err := connect(address)
 	if err != nil {
@@ -31,8 +31,10 @@ func Reply(address, text string, sessionId int) error {
 
 	// call Reply RPC
 	if _, err := database.NewDatabaseClient(conn).Reply(context.Background(), &database.ReplyMsg{
-		SessionId: int64(sessionId),
-		Text:      text,
+		SessionId:          int64(sessionId),
+		Text:               text,
+		ReturnAddress:      raddress,
+		ParticipantAddress: paddress,
 	}); err != nil {
 		return fmt.Errorf("failed to call reply RPC: %v", err)
 	}
