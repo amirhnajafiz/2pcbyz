@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/F24-CSE535/2pcbyz/client/pkg/rpc/database"
 
@@ -32,7 +33,7 @@ func (s *server) Reply(_ context.Context, msg *database.ReplyMsg) (*emptypb.Empt
 
 	// check the limit, if there are enough responses, return the response to user
 	if s.memory[sid] >= s.limit {
-		s.output <- msg.GetText()
+		s.output <- fmt.Sprintf("%d: %s", msg.GetSessionId(), msg.GetText())
 		delete(s.memory, sid)
 	}
 
