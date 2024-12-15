@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"sync"
 
 	"github.com/F24-CSE535/2pcbyz/client/pkg/rpc/database"
 
@@ -23,6 +24,7 @@ func ListenAndServe(port, limit int, output chan string) error {
 
 	// register all gRPC services
 	database.RegisterDatabaseServer(srv, &server{
+		lock:   sync.Mutex{},
 		limit:  limit,
 		output: output,
 		memory: make(map[int]int),

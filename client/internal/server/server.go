@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"fmt"
+	"sync"
 
 	"github.com/F24-CSE535/2pcbyz/client/pkg/rpc/database"
 
@@ -15,6 +16,7 @@ type server struct {
 
 	limit  int
 	memory map[int]int
+	lock   sync.Mutex
 
 	output chan string
 }
@@ -23,6 +25,8 @@ type server struct {
 func (s *server) Reply(_ context.Context, msg *database.ReplyMsg) (*emptypb.Empty, error) {
 	// get the message sessionId
 	sid := int(msg.GetSessionId())
+
+	s.lock.Lock()
 
 	// add the response message to the memory
 	if _, ok := s.memory[sid]; !ok {
@@ -34,8 +38,10 @@ func (s *server) Reply(_ context.Context, msg *database.ReplyMsg) (*emptypb.Empt
 	// check the limit, if there are enough responses, return the response to user
 	if s.memory[sid] >= s.limit {
 		s.output <- fmt.Sprintf("%d: %s", msg.GetSessionId(), msg.GetText())
-		delete(s.memory, sid)
+		s.memory[sid] = -12
 	}
+
+	s.lock.Unlock()
 
 	return &emptypb.Empty{}, nil
 }
