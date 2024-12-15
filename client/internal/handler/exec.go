@@ -104,16 +104,21 @@ func (h *Handler) next(_ int, _ []string) (string, error) {
 		network.NonByzantine(h.ipt.Services[svc])
 	}
 
+	output := fmt.Sprintf("test set %d:\n", h.index+1)
+
 	// update servers status
 	for _, svc := range h.tests[h.index]["servers"].([]string) {
 		network.Unblock(h.ipt.Services[svc])
+		output = fmt.Sprintf("%s%s ", output, svc)
 	}
+	output = output + "live servers:\n"
 	for _, svc := range h.tests[h.index]["byzantines"].([]string) {
 		network.Byzantine(h.ipt.Services[svc])
+		output = fmt.Sprintf("%s%s ", output, svc)
 	}
+	output = output + "byzantine servers:\n"
 
 	// make transactions by calling the handler request
-	output := fmt.Sprintf("test set %d:\n", h.index+1)
 	for _, trx := range h.tests[h.index]["transactions"].([][]string) {
 		if msg, err := h.request(3, trx); err != nil {
 			return "", err
