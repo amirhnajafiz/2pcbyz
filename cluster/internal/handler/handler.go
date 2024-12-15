@@ -8,16 +8,23 @@ import (
 	"go.uber.org/zap"
 )
 
-// Handler is a process that gets requests from gRPC module and executes
-// sub-handlers based on the input request.
+// Handler is a process that gets requests from gRPC module and executes sub-handlers based on the input request.
 type Handler struct {
 	Logger  *zap.Logger
 	Storage *storage.Storage
 	Queue   chan context.Context
 }
 
+// Start consuming messages.
 func (h *Handler) Start() {
 	for {
-		<-h.Queue
+		// get context messages from queue
+		ctx := <-h.Queue
+
+		// map of method to handler
+		switch ctx.Value("method") {
+		case "request":
+			h.request(ctx.Value("request"))
+		}
 	}
 }
