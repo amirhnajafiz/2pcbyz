@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"strings"
 	"time"
 
 	"github.com/F24-CSE535/2pcbyz/cluster/internal/models"
@@ -212,6 +213,16 @@ func (h *Handler) reply(payload interface{}) {
 
 	// get sessionId
 	sessionId := int(msg.GetSessionId())
+
+	// call reply on all other nodes
+	local := localAddress(h.Port)
+	for _, svc := range strings.Split(h.Ipt.Endpoints[h.Cfg.Name], ":") {
+		if svc != local {
+			if err := network.Reply(svc, msg.GetReturnAddress(), msg.GetParticipantAddress(), msg.GetText(), sessionId); err != nil {
+				h.Logger.Warn("failed to call node", zap.Error(err))
+			}
+		}
+	}
 
 	// check for commit or abort
 	var ctx context.Context
