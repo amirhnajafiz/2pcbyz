@@ -10,6 +10,7 @@ import (
 
 	"github.com/F24-CSE535/2pcbyz/cluster/internal/config"
 	"github.com/F24-CSE535/2pcbyz/cluster/internal/handler"
+	"github.com/F24-CSE535/2pcbyz/cluster/internal/pbft"
 	"github.com/F24-CSE535/2pcbyz/cluster/internal/server"
 	"github.com/F24-CSE535/2pcbyz/cluster/internal/storage"
 	"github.com/F24-CSE535/2pcbyz/cluster/pkg/logger"
@@ -67,16 +68,27 @@ func main() {
 
 			// create a handler queue
 			queue := make(chan context.Context, cfg.Handler.QueueSize)
+			consensus := make(chan context.Context, cfg.Handler.QueueSize)
+
+			// create a consensus module
+			sm := pbft.StateMachine{
+				Consensus: consensus,
+				Queue:     queue,
+				Logger:    logr.Named("pbft"),
+			}
+
+			go sm.Start()
 
 			// create a new handler instance
 			hdl := handler.Handler{
-				Sequence: int(time.Now().Unix()),
-				Port:     port,
-				Cfg:      &cfg,
-				Ipt:      &ipt,
-				Logger:   logr.Named("handler"),
-				Storage:  stg,
-				Queue:    queue,
+				Sequence:  int(time.Now().Unix()),
+				Port:      port,
+				Cfg:       &cfg,
+				Ipt:       &ipt,
+				Logger:    logr.Named("handler"),
+				Storage:   stg,
+				Consensus: consensus,
+				Queue:     queue,
 			}
 
 			// start the handler instances in a go-routine
@@ -93,6 +105,7 @@ func main() {
 				Logger:      logr.Named("grpc"),
 				Storage:     stg,
 				Queue:       queue,
+				Consensus:   consensus,
 			}
 
 			// start the gRPC server

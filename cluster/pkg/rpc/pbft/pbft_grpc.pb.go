@@ -25,10 +25,6 @@ const (
 	PBFT_Prepare_FullMethodName       = "/pbft.PBFT/Prepare"
 	PBFT_AckPrepare_FullMethodName    = "/pbft.PBFT/AckPrepare"
 	PBFT_Commit_FullMethodName        = "/pbft.PBFT/Commit"
-	PBFT_Block_FullMethodName         = "/pbft.PBFT/Block"
-	PBFT_Unblock_FullMethodName       = "/pbft.PBFT/Unblock"
-	PBFT_Byzantine_FullMethodName     = "/pbft.PBFT/Byzantine"
-	PBFT_NonByzantine_FullMethodName  = "/pbft.PBFT/NonByzantine"
 )
 
 // PBFTClient is the client API for PBFT service.
@@ -43,10 +39,6 @@ type PBFTClient interface {
 	Prepare(ctx context.Context, in *PrepareMsg, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	AckPrepare(ctx context.Context, in *PrepareAck, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	Commit(ctx context.Context, in *CommitMsg, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	Block(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	Unblock(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	Byzantine(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	NonByzantine(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type pBFTClient struct {
@@ -107,46 +99,6 @@ func (c *pBFTClient) Commit(ctx context.Context, in *CommitMsg, opts ...grpc.Cal
 	return out, nil
 }
 
-func (c *pBFTClient) Block(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, PBFT_Block_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *pBFTClient) Unblock(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, PBFT_Unblock_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *pBFTClient) Byzantine(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, PBFT_Byzantine_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *pBFTClient) NonByzantine(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, PBFT_NonByzantine_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // PBFTServer is the server API for PBFT service.
 // All implementations must embed UnimplementedPBFTServer
 // for forward compatibility.
@@ -159,10 +111,6 @@ type PBFTServer interface {
 	Prepare(context.Context, *PrepareMsg) (*emptypb.Empty, error)
 	AckPrepare(context.Context, *PrepareAck) (*emptypb.Empty, error)
 	Commit(context.Context, *CommitMsg) (*emptypb.Empty, error)
-	Block(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
-	Unblock(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
-	Byzantine(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
-	NonByzantine(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
 	mustEmbedUnimplementedPBFTServer()
 }
 
@@ -187,18 +135,6 @@ func (UnimplementedPBFTServer) AckPrepare(context.Context, *PrepareAck) (*emptyp
 }
 func (UnimplementedPBFTServer) Commit(context.Context, *CommitMsg) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Commit not implemented")
-}
-func (UnimplementedPBFTServer) Block(context.Context, *emptypb.Empty) (*emptypb.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Block not implemented")
-}
-func (UnimplementedPBFTServer) Unblock(context.Context, *emptypb.Empty) (*emptypb.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Unblock not implemented")
-}
-func (UnimplementedPBFTServer) Byzantine(context.Context, *emptypb.Empty) (*emptypb.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Byzantine not implemented")
-}
-func (UnimplementedPBFTServer) NonByzantine(context.Context, *emptypb.Empty) (*emptypb.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method NonByzantine not implemented")
 }
 func (UnimplementedPBFTServer) mustEmbedUnimplementedPBFTServer() {}
 func (UnimplementedPBFTServer) testEmbeddedByValue()              {}
@@ -311,78 +247,6 @@ func _PBFT_Commit_Handler(srv interface{}, ctx context.Context, dec func(interfa
 	return interceptor(ctx, in, info, handler)
 }
 
-func _PBFT_Block_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(emptypb.Empty)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(PBFTServer).Block(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: PBFT_Block_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PBFTServer).Block(ctx, req.(*emptypb.Empty))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _PBFT_Unblock_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(emptypb.Empty)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(PBFTServer).Unblock(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: PBFT_Unblock_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PBFTServer).Unblock(ctx, req.(*emptypb.Empty))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _PBFT_Byzantine_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(emptypb.Empty)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(PBFTServer).Byzantine(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: PBFT_Byzantine_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PBFTServer).Byzantine(ctx, req.(*emptypb.Empty))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _PBFT_NonByzantine_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(emptypb.Empty)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(PBFTServer).NonByzantine(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: PBFT_NonByzantine_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PBFTServer).NonByzantine(ctx, req.(*emptypb.Empty))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 // PBFT_ServiceDesc is the grpc.ServiceDesc for PBFT service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -409,22 +273,6 @@ var PBFT_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Commit",
 			Handler:    _PBFT_Commit_Handler,
-		},
-		{
-			MethodName: "Block",
-			Handler:    _PBFT_Block_Handler,
-		},
-		{
-			MethodName: "Unblock",
-			Handler:    _PBFT_Unblock_Handler,
-		},
-		{
-			MethodName: "Byzantine",
-			Handler:    _PBFT_Byzantine_Handler,
-		},
-		{
-			MethodName: "NonByzantine",
-			Handler:    _PBFT_NonByzantine_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

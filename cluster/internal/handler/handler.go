@@ -11,13 +11,14 @@ import (
 
 // Handler is a process that gets requests from gRPC module and executes sub-handlers based on the input request.
 type Handler struct {
-	Sequence int
-	Port     int
-	Cfg      *config.Config
-	Ipt      *config.IPTable
-	Logger   *zap.Logger
-	Storage  *storage.Storage
-	Queue    chan context.Context
+	Sequence  int
+	Port      int
+	Cfg       *config.Config
+	Ipt       *config.IPTable
+	Logger    *zap.Logger
+	Storage   *storage.Storage
+	Consensus chan context.Context
+	Queue     chan context.Context
 
 	states map[int]string
 }

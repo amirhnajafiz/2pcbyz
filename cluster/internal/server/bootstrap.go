@@ -18,6 +18,7 @@ type Bootstrap struct {
 	ServicePort int
 	Logger      *zap.Logger
 	Storage     *storage.Storage
+	Consensus   chan context.Context // this queue is the pbft's input channel
 	Queue       chan context.Context // this queue is the handler's input channel
 }
 

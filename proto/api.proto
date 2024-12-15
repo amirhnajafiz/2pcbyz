@@ -9,6 +9,10 @@ option go_package = "./rpc/api";
 service API {
   rpc PrintBalance(PrintBalanceMsg) returns (PrintBalanceRsp) {}
   rpc PrintDatastore(google.protobuf.Empty) returns (stream DatastoreRsp) {}
+  rpc Block(google.protobuf.Empty) returns (google.protobuf.Empty) {}
+  rpc Unblock(google.protobuf.Empty) returns (google.protobuf.Empty) {}
+  rpc Byzantine(google.protobuf.Empty) returns (google.protobuf.Empty) {}
+  rpc NonByzantine(google.protobuf.Empty) returns (google.protobuf.Empty) {}
 }
 
 message PrintBalanceMsg {
