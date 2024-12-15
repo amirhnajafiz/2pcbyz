@@ -2,6 +2,7 @@ package handler
 
 import (
 	"github.com/F24-CSE535/2pcbyz/cluster/internal/models"
+	"github.com/F24-CSE535/2pcbyz/cluster/internal/network"
 	"github.com/F24-CSE535/2pcbyz/cluster/pkg/rpc/database"
 
 	"go.uber.org/zap"
@@ -91,7 +92,8 @@ func (h *Handler) request(payload interface{}) {
 			),
 			contextKey("request"),
 			&database.AbortMsg{
-				SessionId: trx.GetTransaction().GetSessionId(),
+				SessionId:     trx.GetTransaction().GetSessionId(),
+				ReturnAddress: trx.GetReturnAddress(),
 			},
 		)
 	}
@@ -118,6 +120,11 @@ func (h *Handler) abort(payload interface{}) {
 	// update transaction
 	if err := h.Storage.UpdateTransactionStatus(sessionId, models.StsAbort); err != nil {
 		h.Logger.Warn("failed to update transaction", zap.Error(err))
+	}
+
+	// reply back to the user
+	if err := network.Reply(trx.GetReturnAddress(), "FAIL", sessionId); err != nil {
+		h.Logger.Warn("failed to send reply", zap.Error(err))
 	}
 }
 
@@ -155,5 +162,10 @@ func (h *Handler) commit(payload interface{}) {
 	// update transaction
 	if err := h.Storage.UpdateTransactionStatus(sessionId, models.StsCommit); err != nil {
 		h.Logger.Warn("failed to update transaction", zap.Error(err))
+	}
+
+	// reply back to the user
+	if err := network.Reply(trx.GetReturnAddress(), "OK", sessionId); err != nil {
+		h.Logger.Warn("failed to send reply", zap.Error(err))
 	}
 }

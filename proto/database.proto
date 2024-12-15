@@ -58,4 +58,5 @@ message CommitMsg {
 // abort is used in the second phase of 2pc if at least one node aborts prepare.
 message AbortMsg {
   int64 session_id = 1;
+  string return_address = 2;
 }

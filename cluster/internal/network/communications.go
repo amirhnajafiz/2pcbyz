@@ -1,8 +1,10 @@
 package network
 
 import (
+	"context"
 	"fmt"
 
+	"github.com/F24-CSE535/2pcbyz/cluster/pkg/rpc/database"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -15,4 +17,24 @@ func connect(address string) (*grpc.ClientConn, error) {
 	}
 
 	return conn, nil
+}
+
+// Reply calls the reply RPC on the client.
+func Reply(address, text string, sessionId int) error {
+	// base connection
+	conn, err := connect(address)
+	if err != nil {
+		return err
+	}
+	defer conn.Close()
+
+	// call Reply RPC
+	if _, err := database.NewDatabaseClient(conn).Reply(context.Background(), &database.ReplyMsg{
+		SessionId: int64(sessionId),
+		Text:      text,
+	}); err != nil {
+		return fmt.Errorf("failed to call reply RPC: %v", err)
+	}
+
+	return nil
 }
