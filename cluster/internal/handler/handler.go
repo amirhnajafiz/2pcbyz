@@ -21,12 +21,32 @@ type Handler struct {
 	Consensus chan context.Context
 	Queue     chan context.Context
 
+	dispatcher chan context.Context
+	notify     chan context.Context
+
 	states map[int]string
+}
+
+func (h *Handler) dispatch() {
+	for {
+		ctx := <-h.dispatcher
+
+		method := ctx.Value("method").(string)
+		payload := ctx.Value("request")
+
+		h.Queue <- context.WithValue(context.WithValue(context.Background(), "method", "process-"+method), "request", payload)
+
+		<-h.notify
+	}
 }
 
 // Start consuming messages.
 func (h *Handler) Start() {
 	h.states = make(map[int]string)
+	h.dispatcher = make(chan context.Context, 20)
+	h.notify = make(chan context.Context)
+
+	go h.dispatch()
 
 	for {
 		// get context messages from queue
@@ -38,8 +58,12 @@ func (h *Handler) Start() {
 		case "begin":
 			h.begin(payload)
 		case "intershard":
+			h.dispatcher <- ctx
+		case "process-intershard":
 			h.intershard(payload)
 		case "prepare":
+			h.dispatcher <- ctx
+		case "process-prepare":
 			h.prepare(payload)
 		case "reply":
 			h.reply(payload)

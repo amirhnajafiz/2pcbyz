@@ -317,6 +317,10 @@ func (h *Handler) reply(payload interface{}) {
 }
 
 func (h *Handler) abort(payload interface{}) {
+	defer func() {
+		h.notify <- nil
+	}()
+
 	// get transaction
 	trx := payload.(*database.AbortMsg)
 
@@ -343,6 +347,10 @@ func (h *Handler) abort(payload interface{}) {
 }
 
 func (h *Handler) commit(payload interface{}) {
+	defer func() {
+		h.notify <- nil
+	}()
+
 	// get transaction
 	trx := payload.(*database.CommitMsg)
 
