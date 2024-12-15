@@ -45,7 +45,7 @@ func (h *Handler) begin(payload interface{}) {
 		h.Logger.Info("cross-shard transaction", zap.Int64("session_id", trx.GetTransaction().GetSessionId()))
 
 		// call cross-shard
-		if err := network.Prepare(localAddress(h.Port), trx); err != nil {
+		if err := network.Prepare(h.Ipt.Services[h.Ipt.Endpoints[rshard]], trx); err != nil {
 			h.Logger.Error("failed to call participant", zap.Error(err))
 		}
 	}
