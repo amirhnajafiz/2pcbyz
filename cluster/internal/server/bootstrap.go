@@ -1,4 +1,4 @@
-package grpc
+package server
 
 import (
 	"context"
@@ -19,8 +19,8 @@ type Bootstrap struct {
 	Queue       chan context.Context // this queue is the handler's input channel
 }
 
-// ListenAnsServer creates a new gRPC instance with all required services.
-func (b *Bootstrap) ListenAndServer() error {
+// ListenAndServe creates a new gRPC instance with all required services.
+func (b *Bootstrap) ListenAndServe() error {
 	// on the local network, listen to a port
 	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", b.ServicePort))
 	if err != nil {

@@ -1,4 +1,4 @@
-package grpc
+package server
 
 // contextKey is used in order to store key-value pairs inside a context
 type contextKey string

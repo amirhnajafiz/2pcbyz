@@ -8,8 +8,8 @@ import (
 	"sync"
 
 	"github.com/F24-CSE535/2pcbyz/cluster/internal/config"
-	"github.com/F24-CSE535/2pcbyz/cluster/internal/grpc"
 	"github.com/F24-CSE535/2pcbyz/cluster/internal/handler"
+	"github.com/F24-CSE535/2pcbyz/cluster/internal/server"
 	"github.com/F24-CSE535/2pcbyz/cluster/internal/storage"
 	"github.com/F24-CSE535/2pcbyz/cluster/pkg/logger"
 )
@@ -78,7 +78,7 @@ func main() {
 			}
 
 			// create a bootstrap instance
-			bts := grpc.Bootstrap{
+			bts := server.Bootstrap{
 				ServicePort: port,
 				Logger:      logr.Named("grpc"),
 				Storage:     stg,
@@ -86,7 +86,7 @@ func main() {
 			}
 
 			// start the gRPC server
-			if err := bts.ListenAndServer(); err != nil {
+			if err := bts.ListenAndServe(); err != nil {
 				log.Println(err)
 			}
 		}(replica.Name, replica.Port)
