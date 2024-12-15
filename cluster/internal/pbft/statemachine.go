@@ -40,20 +40,41 @@ func (sm *StateMachine) Start() {
 		// map of method to handler
 		switch ctx.Value("method").(string) {
 		case "request":
+			if sm.block || sm.byzantine {
+				continue
+			}
 			err = sm.request(payload)
 		case "input":
+			if sm.block || sm.byzantine {
+				continue
+			}
 			err = sm.input(payload)
 		case "preprepare":
+			if sm.block || sm.byzantine {
+				continue
+			}
 			err = sm.prePrepare(payload)
-		case "ackpreprepare":
+		case "pbft.ackpreprepare":
+			if sm.block || sm.byzantine {
+				continue
+			}
 			err = sm.ackPrePrepare(payload)
-		case "prepare":
+		case "pbft.prepare":
+			if sm.block || sm.byzantine {
+				continue
+			}
 			err = sm.prepare(payload)
-		case "ackprepare":
+		case "pbft.ackprepare":
+			if sm.block || sm.byzantine {
+				continue
+			}
 			err = sm.ackPrepare(payload)
-		case "commit":
+		case "pbft.commit":
+			if sm.block || sm.byzantine {
+				continue
+			}
 			err = sm.commit(payload)
-		case "timeout":
+		case "pbft.timeout":
 			err = sm.timeout(payload)
 		case "block":
 			sm.block = true

@@ -42,10 +42,7 @@ func (b *Bootstrap) checkEmptyReturnCallsInterceptor(
 		ctx := context.WithValue(context.WithValue(context.Background(), "method", method), "request", req)
 
 		// if the service is database or pbft, it is an empty return call
-		if svc == "databaseDatabase" {
-			b.Queue <- ctx
-			return nil, nil
-		} else if svc == "pbftPBFT" || method == "block" || method == "unblock" || method == "byzantine" || method == "nonbyzantine" {
+		if svc == "databaseDatabase" || svc == "pbftPBFT" || method == "block" || method == "unblock" || method == "byzantine" || method == "nonbyzantine" {
 			b.Consensus <- ctx
 			return nil, nil
 		}

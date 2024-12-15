@@ -13,6 +13,7 @@ import (
 type Handler struct {
 	Sequence  int
 	Port      int
+	Leader    bool
 	Cfg       *config.Config
 	Ipt       *config.IPTable
 	Logger    *zap.Logger
@@ -34,8 +35,6 @@ func (h *Handler) Start() {
 
 		// map of method to handler
 		switch ctx.Value("method").(string) {
-		case "request":
-			h.Consensus <- ctx
 		case "begin":
 			h.begin(payload)
 		case "intershard":

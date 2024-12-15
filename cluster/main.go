@@ -85,6 +85,7 @@ func main() {
 			hdl := handler.Handler{
 				Sequence:  int(time.Now().Unix()),
 				Port:      port,
+				Leader:    name == cfg.Leader,
 				Cfg:       &cfg,
 				Ipt:       &ipt,
 				Logger:    logr.Named("handler"),

@@ -137,10 +137,6 @@ func (sm *StateMachine) prepare(payload interface{}) error {
 		ReturnAddress: msg.Transaction.GetReturnAddress(),
 	}
 
-	if sm.block || sm.byzantine {
-		return fmt.Errorf("node cannot process this message: block %t, byzantine %t", sm.block, sm.byzantine)
-	}
-
 	// send to handler
 	sm.Queue <- context.WithValue(context.WithValue(context.Background(), "method", "begin"), "request", req)
 

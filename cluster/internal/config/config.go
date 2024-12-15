@@ -13,6 +13,7 @@ import (
 type Config struct {
 	LogLevel string          `koanf:"log_level"` // log level can be (debug, info, warn, error, panic, fatal)
 	Name     string          `koanf:"name"`      // cluster name
+	Leader   string          `koanf:"leader"`    // the cluster leader
 	Handler  HandlerConfig   `koanf:"handler"`   // types.HandlerConfig
 	Replicas []ReplicaConfig `koanf:"replicas"`  // types.ReplicaConfig
 	Shard    ShardConfig     `koanf:"shard"`     // types.ShardConfig

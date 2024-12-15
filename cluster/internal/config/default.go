@@ -4,6 +4,7 @@ func Default() Config {
 	return Config{
 		LogLevel: "debug",
 		Name:     "C0",
+		Leader:   "C0",
 		Handler: HandlerConfig{
 			Instances: 0,
 			QueueSize: 0,

@@ -46,8 +46,10 @@ func (h *Handler) begin(payload interface{}) {
 		h.Logger.Info("cross-shard transaction", zap.Int64("session_id", trx.GetTransaction().GetSessionId()))
 
 		// call cross-shard
-		if err := network.Prepare(h.Ipt.Services[h.Ipt.Endpoints[rshard]], trx); err != nil {
-			h.Logger.Error("failed to call participant", zap.Error(err))
+		if h.Leader {
+			if err := network.Prepare(h.Ipt.Services[h.Ipt.Endpoints[rshard]], trx); err != nil {
+				h.Logger.Error("failed to call participant", zap.Error(err))
+			}
 		}
 	}
 }
@@ -195,8 +197,10 @@ func (h *Handler) prepare(payload interface{}) {
 	}
 
 	// callback the coordinator
-	if err := network.Reply(trx.CoordinatorAddress, trx.ReturnAddress, localAddress(h.Port), msg, sessionId); err != nil {
-		h.Logger.Warn("failed to call the coordinator", zap.Error(err))
+	if h.Leader {
+		if err := network.Reply(trx.CoordinatorAddress, trx.ReturnAddress, localAddress(h.Port), msg, sessionId); err != nil {
+			h.Logger.Warn("failed to call the coordinator", zap.Error(err))
+		}
 	}
 }
 
@@ -294,15 +298,17 @@ func (h *Handler) reply(payload interface{}) {
 	}
 
 	// callback the cluster
-	if ctx.Value("method").(string) == "abort" {
-		// call abort on participant
-		if err := network.Abort(msg.GetParticipantAddress(), msg.GetReturnAddress(), sessionId); err != nil {
-			h.Logger.Warn("failed to call the participant", zap.Error(err))
-		}
-	} else if ctx.Value("method").(string) == "commit" {
-		// call commit on participant
-		if err := network.Commit(msg.GetParticipantAddress(), msg.GetReturnAddress(), sessionId); err != nil {
-			h.Logger.Warn("failed to call the participant", zap.Error(err))
+	if h.Leader {
+		if ctx.Value("method").(string) == "abort" {
+			// call abort on participant
+			if err := network.Abort(msg.GetParticipantAddress(), msg.GetReturnAddress(), sessionId); err != nil {
+				h.Logger.Warn("failed to call the participant", zap.Error(err))
+			}
+		} else if ctx.Value("method").(string) == "commit" {
+			// call commit on participant
+			if err := network.Commit(msg.GetParticipantAddress(), msg.GetReturnAddress(), sessionId); err != nil {
+				h.Logger.Warn("failed to call the participant", zap.Error(err))
+			}
 		}
 	}
 
