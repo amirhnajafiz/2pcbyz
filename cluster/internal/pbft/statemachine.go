@@ -10,7 +10,6 @@ import (
 
 // StateMachine runs PBFT protocol.
 type StateMachine struct {
-	Port      int
 	Cluster   string
 	Ipt       *config.IPTable
 	Consensus chan context.Context

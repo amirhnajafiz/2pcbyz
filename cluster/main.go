@@ -75,6 +75,8 @@ func main() {
 				Consensus: consensus,
 				Queue:     queue,
 				Logger:    logr.Named("pbft"),
+				Ipt:       &ipt,
+				Cluster:   cfg.Name,
 			}
 
 			go sm.Start()
