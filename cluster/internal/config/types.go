@@ -14,7 +14,7 @@ type StorageConfig struct {
 
 // ShardConfig stores the values of the cluster shards.
 type ShardConfig struct {
-	Cluster string `koanf:"name"`
+	Cluster string `koanf:"cluster"`
 	From    int    `koanf:"from"`
 	To      int    `koanf:"to"`
 }
