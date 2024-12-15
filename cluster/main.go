@@ -46,7 +46,7 @@ func main() {
 			}
 
 			// open database connection
-			stg, err := storage.NewStorage(cfg.Storage.URI, cfg.Storage.Database)
+			stg, err := storage.NewStorage(cfg.Storage.URI, cfg.Storage.Database, name)
 			if err != nil {
 				log.Fatal(err)
 				return

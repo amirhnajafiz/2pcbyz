@@ -8,9 +8,14 @@ type HandlerConfig struct {
 
 // StorageConfig stores the default values for MongoDB cluster.
 type StorageConfig struct {
-	URI       string `koanf:"uri"`
-	Database  string `koanf:"database"`
-	Partition string `koanf:"-"`
+	URI      string `koanf:"uri"`
+	Database string `koanf:"database"`
+}
+
+// ShardConfig stores the values of the cluster shards.
+type ShardConfig struct {
+	Name  string `koanf:"name"`
+	Range []int  `koanf:"range"`
 }
 
 // ReplicaConfig stores the replicas information in cluster to setup.

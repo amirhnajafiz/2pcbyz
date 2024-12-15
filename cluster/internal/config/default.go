@@ -12,6 +12,10 @@ func Default() Config {
 			URI:      "mongo://localhost:1272",
 			Database: "C0",
 		},
+		Shard: ShardConfig{
+			Name:  "D0",
+			Range: make([]int, 0),
+		},
 		Replicas: []ReplicaConfig{},
 	}
 }

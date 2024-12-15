@@ -14,7 +14,7 @@ type Storage struct {
 }
 
 // NewStorage opens a MongoDB connection and returns an instance of storage struct.
-func NewStorage(uri string, database string) (*Storage, error) {
+func NewStorage(uri, database, partition string) (*Storage, error) {
 	// open a new connection to MongoDB cluster
 	conn, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(uri))
 	if err != nil {
