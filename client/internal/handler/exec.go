@@ -69,6 +69,28 @@ func (h *Handler) printBalance(argc int, argv []string) (string, error) {
 	return output, nil
 }
 
+// printDatastore loops over all nodes and call PrintDatastore RPC.
+func (h *Handler) printDatastore(_ int, _ []string) (string, error) {
+	list := []string{"C1", "C2", "C3"}
+
+	// loop over all nodes and call print datastore
+	output := "datastores:\n"
+	for _, cluster := range list {
+		for _, svc := range strings.Split(h.ipt.Endpoints[fmt.Sprintf("E%s", cluster)], ":") {
+			if datastore, err := network.PrintDatastore(h.ipt.Services[svc]); err != nil {
+				return "", err
+			} else {
+				output = fmt.Sprintf("%s\t- %s:\n", output, svc)
+				for _, item := range datastore {
+					output = fmt.Sprintf("%s\t\t- %s\n", output, item)
+				}
+			}
+		}
+	}
+
+	return output, nil
+}
+
 // next runs the next testcase.
 func (h *Handler) next(_ int, _ []string) (string, error) {
 	// check the index variable
