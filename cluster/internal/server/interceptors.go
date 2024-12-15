@@ -2,7 +2,7 @@ package server
 
 import (
 	"context"
-	"strings"
+	"fmt"
 
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -40,15 +40,16 @@ func (b *Bootstrap) checkEmptyReturnCallsInterceptor(
 ) (interface{}, error) {
 	// parse to get service and method
 	if svc, method, err := parseFullMethod(info.FullMethod); err == nil {
+		fmt.Println(svc, method)
 		// if the service is database or pbft, it is an empty return call
-		if strings.HasPrefix(svc, "database") || strings.HasPrefix(svc, "pbft") {
+		if svc == "databaseDatabase" || svc == "pbftPBFT" {
 			b.Queue <- context.WithValue(
 				context.WithValue(
 					context.Background(),
-					contextKey("method"),
+					"method",
 					method,
 				),
-				contextKey("request"),
+				"request",
 				req,
 			)
 

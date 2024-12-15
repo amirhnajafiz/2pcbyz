@@ -74,10 +74,10 @@ func (h *Handler) request(payload interface{}) {
 		ctx = context.WithValue(
 			context.WithValue(
 				context.Background(),
-				contextKey("method"),
+				"method",
 				"commit",
 			),
-			contextKey("request"),
+			"request",
 			&database.CommitMsg{
 				SessionId:     trx.GetTransaction().GetSessionId(),
 				ReturnAddress: trx.GetReturnAddress(),
@@ -87,10 +87,10 @@ func (h *Handler) request(payload interface{}) {
 		ctx = context.WithValue(
 			context.WithValue(
 				context.Background(),
-				contextKey("method"),
+				"method",
 				"abort",
 			),
-			contextKey("request"),
+			"request",
 			&database.AbortMsg{
 				SessionId:     trx.GetTransaction().GetSessionId(),
 				ReturnAddress: trx.GetReturnAddress(),

@@ -6,6 +6,7 @@ import (
 	"net"
 
 	"github.com/F24-CSE535/2pcbyz/cluster/internal/storage"
+	"github.com/F24-CSE535/2pcbyz/cluster/pkg/rpc/database"
 
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -34,6 +35,7 @@ func (b *Bootstrap) ListenAndServe() error {
 	)
 
 	// register all gRPC services
+	database.RegisterDatabaseServer(server, database.UnimplementedDatabaseServer{})
 
 	// starting the server
 	b.Logger.Info("grpc started", zap.Int("port", b.ServicePort))

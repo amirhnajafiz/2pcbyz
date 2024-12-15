@@ -20,15 +20,16 @@ func (h *Handler) Start() {
 	for {
 		// get context messages from queue
 		ctx := <-h.Queue
+		payload := ctx.Value("request")
 
 		// map of method to handler
 		switch ctx.Value("method") {
 		case "request":
-			h.request(ctx.Value("request"))
+			h.request(payload)
 		case "abort":
-			h.abort(ctx.Value("request"))
+			h.abort(payload)
 		case "commit":
-			h.commit(ctx.Value("request"))
+			h.commit(payload)
 		}
 	}
 }
