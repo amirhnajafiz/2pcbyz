@@ -10,9 +10,9 @@ import (
 )
 
 // request accepts all parameters for a transaction and calls a Request RPC.
-func (h *Handler) request(argc int, argv []string) error {
+func (h *Handler) request(argc int, argv []string) (string, error) {
 	if argc < 3 {
-		return errors.New("not enough arguments (sender receiver amount)")
+		return "", errors.New("not enough arguments (sender receiver amount)")
 	}
 
 	// parse input arguments
@@ -37,8 +37,31 @@ func (h *Handler) request(argc int, argv []string) error {
 		},
 		ReturnAddress: localAddress(h.cfg.Port), // set the return address
 	}); err != nil {
-		return fmt.Errorf("rpc failed: %v", err)
+		return "", fmt.Errorf("rpc failed: %v", err)
 	}
 
-	return nil
+	return fmt.Sprintf("transaction %d submitted", session), nil
+}
+
+// next runs the next testcase.
+func (h *Handler) next(_ int, _ []string) (string, error) {
+	// check the index variable
+	if h.index == len(h.tests) {
+		return "", nil
+	}
+
+	// make transactions by calling the handler request
+	output := ""
+	for _, trx := range h.tests[h.index]["transactions"].([][]string) {
+		if msg, err := h.request(3, trx); err != nil {
+			return "", err
+		} else {
+			output = fmt.Sprintf("%s%s\n", output, msg)
+		}
+	}
+
+	// increase index
+	h.index++
+
+	return output, nil
 }

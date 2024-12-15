@@ -9,12 +9,13 @@ import (
 	"github.com/F24-CSE535/2pcbyz/client/internal/config"
 	"github.com/F24-CSE535/2pcbyz/client/internal/handler"
 	"github.com/F24-CSE535/2pcbyz/client/internal/server"
+	"github.com/F24-CSE535/2pcbyz/client/internal/utils"
 )
 
 func main() {
 	args := os.Args
 	if len(args) < 3 {
-		panic("at least two arguments are needed (./main <config-path> <iptable>)")
+		panic("at least two arguments are needed (./main <config-path> <iptable> <testcase>)")
 	}
 
 	// load config file
@@ -25,6 +26,13 @@ func main() {
 
 	// create a new handler
 	hd := handler.NewHandler(&cfg, &ipt)
+
+	// load the input tests
+	if len(args) == 4 {
+		if val, err := utils.CSVParseTestcaseFile(args[3]); err == nil {
+			hd.SetTests(val)
+		}
+	}
 
 	// run a gRPC server
 	go server.ListenAndServe(cfg.Port)
@@ -50,8 +58,10 @@ func main() {
 		cargsc := len(cargs)
 
 		// call exec on handler
-		if err := hd.Exec(parts[0], cargsc, cargs); err != nil {
+		if msg, err := hd.Exec(parts[0], cargsc, cargs); err != nil {
 			fmt.Println(err)
+		} else {
+			fmt.Println(msg)
 		}
 	}
 }

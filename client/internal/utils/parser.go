@@ -33,7 +33,7 @@ func CSVParseTestcaseFile(path string) ([]map[string]interface{}, error) {
 		index      string
 		servers    []string
 		byzantines []string
-		sets       []string
+		sets       [][]string
 	)
 
 	// read row by row
@@ -41,9 +41,11 @@ func CSVParseTestcaseFile(path string) ([]map[string]interface{}, error) {
 		if row[0] == "" { // old row
 			tmp := strings.Split(strings.Replace(strings.Replace(row[1], "(", "", -1), ")", "", -1), ", ")
 			sets = append(sets,
-				strings.TrimSpace(tmp[0]),
-				strings.TrimSpace(tmp[1]),
-				strings.TrimSpace(tmp[2]),
+				[]string{
+					strings.TrimSpace(tmp[0]),
+					strings.TrimSpace(tmp[1]),
+					strings.TrimSpace(tmp[2]),
+				},
 			)
 		} else {
 			// save the current values
@@ -59,7 +61,7 @@ func CSVParseTestcaseFile(path string) ([]map[string]interface{}, error) {
 			index = row[0]
 			servers = make([]string, 0)
 			byzantines = make([]string, 0)
-			sets = make([]string, 0)
+			sets = make([][]string, 0)
 
 			// set servers and contact servers
 			tmpS := append(servers, strings.Split(strings.Replace(strings.Replace(row[2], "[", "", -1), "]", "", -1), ", ")...)
@@ -78,9 +80,11 @@ func CSVParseTestcaseFile(path string) ([]map[string]interface{}, error) {
 			// process the first row transactions
 			tmp := strings.Split(strings.Replace(strings.Replace(row[1], "(", "", -1), ")", "", -1), ", ")
 			sets = append(sets,
-				strings.TrimSpace(tmp[0]),
-				strings.TrimSpace(tmp[1]),
-				strings.TrimSpace(tmp[2]),
+				[]string{
+					strings.TrimSpace(tmp[0]),
+					strings.TrimSpace(tmp[1]),
+					strings.TrimSpace(tmp[2]),
+				},
 			)
 		}
 
