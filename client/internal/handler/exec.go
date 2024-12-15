@@ -98,6 +98,20 @@ func (h *Handler) next(_ int, _ []string) (string, error) {
 		return "end of tests", nil
 	}
 
+	// block all servers
+	for _, svc := range strings.Split(h.ipt.Endpoints["all"], ":") {
+		network.Block(h.ipt.Services[svc])
+		network.NonByzantine(h.ipt.Services[svc])
+	}
+
+	// update servers status
+	for _, svc := range h.tests[h.index]["servers"].([]string) {
+		network.Unblock(h.ipt.Services[svc])
+	}
+	for _, svc := range h.tests[h.index]["byzantines"].([]string) {
+		network.Byzantine(h.ipt.Services[svc])
+	}
+
 	// make transactions by calling the handler request
 	output := fmt.Sprintf("test set %d:\n", h.index+1)
 	for _, trx := range h.tests[h.index]["transactions"].([][]string) {
