@@ -96,10 +96,7 @@ func main() {
 
 			// start the handler instances in a go-routine
 			for i := 0; i < cfg.Handler.Instances; i++ {
-				go func() {
-					logr.Info("handler started")
-					hdl.Start()
-				}()
+				go hdl.Start()
 			}
 
 			// create a bootstrap instance
