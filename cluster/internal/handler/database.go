@@ -216,10 +216,12 @@ func (h *Handler) reply(payload interface{}) {
 	sessionId := int(msg.GetSessionId())
 
 	// call reply on all other nodes
-	for _, svc := range strings.Split(h.Ipt.Endpoints[fmt.Sprintf("E%s", h.Cfg.Name)], ":") {
-		if svc != h.Name {
-			if err := network.Reply(h.Ipt.Services[svc], msg.GetReturnAddress(), msg.GetParticipantAddress(), msg.GetText(), sessionId); err != nil {
-				h.Logger.Warn("failed to call node", zap.Error(err))
+	if h.Leader {
+		for _, svc := range strings.Split(h.Ipt.Endpoints[fmt.Sprintf("E%s", h.Cfg.Name)], ":") {
+			if svc != h.Name {
+				if err := network.Reply(h.Ipt.Services[svc], msg.GetReturnAddress(), msg.GetParticipantAddress(), msg.GetText(), sessionId); err != nil {
+					h.Logger.Warn("failed to call node", zap.Error(err))
+				}
 			}
 		}
 	}
