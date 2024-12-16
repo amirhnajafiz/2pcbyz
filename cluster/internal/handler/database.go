@@ -208,7 +208,7 @@ func (h *Handler) prepare(payload interface{}) {
 
 	// callback the coordinator
 	if h.Leader {
-		if err := network.Reply(trx.CoordinatorAddress, trx.ReturnAddress, localAddress(h.Port), msg, sessionId); err != nil {
+		if err := network.Reply(trx.CoordinatorAddress, trx.ReturnAddress, h.Cfg.Name, msg, sessionId); err != nil {
 			h.Logger.Warn("failed to call the coordinator", zap.Error(err))
 		}
 	}
@@ -323,13 +323,17 @@ func (h *Handler) reply(payload interface{}) {
 	if h.Leader {
 		if ctx.Value("method").(string) == "abort" {
 			// call abort on participant
-			if err := network.Abort(msg.GetParticipantAddress(), msg.GetReturnAddress(), sessionId); err != nil {
-				h.Logger.Warn("failed to call the participant", zap.Error(err))
+			for _, svc := range strings.Split(h.Ipt.Endpoints[fmt.Sprintf("E%s", msg.GetParticipantAddress())], ":") {
+				if err := network.Abort(h.Ipt.Services[svc], msg.GetReturnAddress(), sessionId); err != nil {
+					h.Logger.Warn("failed to call the participant", zap.Error(err))
+				}
 			}
 		} else if ctx.Value("method").(string) == "commit" {
 			// call commit on participant
-			if err := network.Commit(msg.GetParticipantAddress(), msg.GetReturnAddress(), sessionId); err != nil {
-				h.Logger.Warn("failed to call the participant", zap.Error(err))
+			for _, svc := range strings.Split(h.Ipt.Endpoints[fmt.Sprintf("E%s", msg.GetParticipantAddress())], ":") {
+				if err := network.Commit(h.Ipt.Services[svc], msg.GetReturnAddress(), sessionId); err != nil {
+					h.Logger.Warn("failed to call the participant", zap.Error(err))
+				}
 			}
 		}
 	}

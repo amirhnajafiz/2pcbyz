@@ -66,6 +66,10 @@ func (sm *StateMachine) Start() {
 		case "nonbyzantine":
 			sm.byzantine = false
 		default:
+			if sm.block || sm.byzantine {
+				continue
+			}
+
 			sm.Queue <- ctx
 		}
 
