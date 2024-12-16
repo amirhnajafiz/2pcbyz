@@ -17,6 +17,8 @@ func (h *Handler) begin(payload interface{}) {
 	// get transaction
 	trx := payload.(*database.RequestMsg)
 
+	h.Logger.Debug("session id is here", zap.Int64("id", trx.GetTransaction().GetSessionId()))
+
 	// insert transaction
 	if err := h.Storage.InsertTransaction(&models.Transaction{
 		Sender:    trx.GetTransaction().GetSender(),
@@ -150,6 +152,7 @@ func (h *Handler) prepare(payload interface{}) {
 
 	// get sessionId
 	sessionId := int(trx.GetTransaction().GetSessionId())
+	h.Logger.Debug("session id is here", zap.Int("id", sessionId))
 
 	// insert locks
 	if err := h.Storage.InsertLock(trx.GetTransaction().GetReceiver()); err != nil {
@@ -217,6 +220,7 @@ func (h *Handler) reply(payload interface{}) {
 
 	// get sessionId
 	sessionId := int(msg.GetSessionId())
+	h.Logger.Debug("session id is here", zap.Int("id", sessionId))
 
 	// call reply on all other nodes
 	if h.Leader {
@@ -348,6 +352,7 @@ func (h *Handler) abort(payload interface{}) {
 
 	// get sessionId
 	sessionId := int(trx.GetSessionId())
+	h.Logger.Debug("session id is here", zap.Int("id", sessionId))
 
 	// insert log
 	if err := h.Storage.InsertLog(&models.Log{
@@ -382,6 +387,7 @@ func (h *Handler) commit(payload interface{}) {
 
 	// get sessionId
 	sessionId := int(trx.GetSessionId())
+	h.Logger.Debug("session id is here", zap.Int("id", sessionId))
 
 	// insert log
 	if err := h.Storage.InsertLog(&models.Log{

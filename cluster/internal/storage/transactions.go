@@ -2,6 +2,7 @@ package storage
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/F24-CSE535/2pcbyz/cluster/internal/models"
 	"go.mongodb.org/mongo-driver/bson"
@@ -30,6 +31,10 @@ func (s *Storage) GetTransaction(sessionId int) (*models.Transaction, error) {
 	var results []*models.Transaction
 	if err = cursor.All(context.TODO(), &results); err != nil {
 		return nil, err
+	}
+
+	if len(results) == 0 {
+		return nil, fmt.Errorf("transaction %d not found", sessionId)
 	}
 
 	return results[0], nil
