@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/F24-CSE535/2pcbyz/cluster/internal/models"
 	"github.com/F24-CSE535/2pcbyz/cluster/internal/network"
 	"github.com/F24-CSE535/2pcbyz/cluster/internal/pbft/validators"
 	"github.com/F24-CSE535/2pcbyz/cluster/pkg/rpc/database"
@@ -70,26 +71,18 @@ func (sm *StateMachine) prePrepare(payload interface{}) error {
 	}
 
 	// convert it to a transaction
-	trx := &database.TransactionMsg{
+	trx := &models.Transaction{
 		Sender:    msg.GetTransaction().GetSender(),
 		Receiver:  msg.GetTransaction().GetReceiver(),
-		Amount:    msg.GetTransaction().GetAmount(),
-		SessionId: msg.GetTransaction().GetSessionId(),
-		Sequence:  msg.GetTransaction().GetSequence(),
+		Amount:    int(msg.GetTransaction().GetAmount()),
+		SessionId: int(msg.GetTransaction().GetSessionId()),
+		Sequence:  int(msg.GetTransaction().GetSequence()),
 	}
 
-	// create a request message
-	req := &database.RequestMsg{
-		Transaction:   trx,
-		ReturnAddress: msg.Transaction.GetReturnAddress(),
+	// insert transaction
+	if err := sm.Storage.InsertTransaction(trx); err != nil {
+		return err
 	}
-
-	if sm.block || sm.byzantine {
-		return fmt.Errorf("node cannot process this message: block %t, byzantine %t", sm.block, sm.byzantine)
-	}
-
-	// send to handler
-	sm.Queue <- context.WithValue(context.WithValue(context.Background(), "method", "begin"), "request", req)
 
 	return nil
 }

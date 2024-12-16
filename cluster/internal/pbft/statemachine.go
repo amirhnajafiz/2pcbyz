@@ -5,6 +5,7 @@ import (
 
 	"github.com/F24-CSE535/2pcbyz/cluster/internal/config"
 	"github.com/F24-CSE535/2pcbyz/cluster/internal/pbft/memory"
+	"github.com/F24-CSE535/2pcbyz/cluster/internal/storage"
 
 	"go.uber.org/zap"
 )
@@ -16,6 +17,7 @@ type StateMachine struct {
 	Consensus chan context.Context
 	Queue     chan context.Context
 	Logger    *zap.Logger
+	Storage   *storage.Storage
 
 	sequence  int
 	block     bool
