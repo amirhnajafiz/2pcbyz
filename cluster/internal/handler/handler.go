@@ -13,6 +13,7 @@ import (
 type Handler struct {
 	Sequence  int
 	Port      int
+	Name      string
 	Leader    bool
 	Cfg       *config.Config
 	Ipt       *config.IPTable

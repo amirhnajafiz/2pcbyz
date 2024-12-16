@@ -83,6 +83,7 @@ func main() {
 
 			// create a new handler instance
 			hdl := handler.Handler{
+				Name:      name,
 				Sequence:  int(time.Now().Unix()),
 				Port:      port,
 				Leader:    name == cfg.Leader,
