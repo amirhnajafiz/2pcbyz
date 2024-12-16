@@ -11,7 +11,9 @@ type SharedMemory struct {
 
 // NewSharedMemory returns an instance of shared memory.
 func NewSharedMemory() *SharedMemory {
-	return &SharedMemory{}
+	return &SharedMemory{
+		SeqLT: -1,
+	}
 }
 
 func (s *SharedMemory) GetClientLastTimestamp() int {

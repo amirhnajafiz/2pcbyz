@@ -51,8 +51,11 @@ func (h *Handler) begin(payload interface{}) {
 
 		// call cross-shard
 		if h.Leader {
-			if err := network.Prepare(h.Ipt.Services[h.Ipt.Endpoints[rshard]], trx); err != nil {
-				h.Logger.Error("failed to call participant", zap.Error(err))
+			time.Sleep(1 * time.Second)
+			for _, svc := range strings.Split(h.Ipt.Endpoints[fmt.Sprintf("E%s", rshard)], ":") {
+				if err := network.Prepare(h.Ipt.Services[svc], trx); err != nil {
+					h.Logger.Error("failed to call participant", zap.Error(err))
+				}
 			}
 		}
 	}
