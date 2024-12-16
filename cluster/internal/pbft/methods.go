@@ -41,6 +41,10 @@ func (sm *StateMachine) request(payload interface{}) error {
 }
 
 func (sm *StateMachine) input(payload interface{}) error {
+	if sm.byzantine || sm.block {
+		return nil
+	}
+
 	// get request message
 	req := payload.(*database.RequestMsg)
 
@@ -61,6 +65,10 @@ func (sm *StateMachine) input(payload interface{}) error {
 }
 
 func (sm *StateMachine) prePrepare(payload interface{}) error {
+	if sm.byzantine || sm.block {
+		return nil
+	}
+
 	// get preprepare message
 	msg := payload.(*pbft.PrePrepareMsg)
 
@@ -109,6 +117,10 @@ func (sm *StateMachine) ackPrePrepare(payload interface{}) error {
 }
 
 func (sm *StateMachine) prepare(payload interface{}) error {
+	if sm.byzantine || sm.block {
+		return nil
+	}
+
 	// get preprepare message
 	msg := payload.(*pbft.PrePrepareMsg)
 
@@ -158,6 +170,10 @@ func (sm *StateMachine) ackPrepare(payload interface{}) error {
 }
 
 func (sm *StateMachine) commit(payload interface{}) error {
+	if sm.byzantine || sm.block {
+		return nil
+	}
+
 	// get pbft message
 	msg := payload.(*pbft.CommitMsg)
 
