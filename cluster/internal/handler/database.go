@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"strings"
 	"time"
 
@@ -216,7 +217,7 @@ func (h *Handler) reply(payload interface{}) {
 
 	// call reply on all other nodes
 	local := localAddress(h.Port)
-	for _, svc := range strings.Split(h.Ipt.Endpoints[h.Cfg.Name], ":") {
+	for _, svc := range strings.Split(fmt.Sprintf("E%s", h.Ipt.Endpoints[h.Cfg.Name]), ":") {
 		if svc != local {
 			if err := network.Reply(svc, msg.GetReturnAddress(), msg.GetParticipantAddress(), msg.GetText(), sessionId); err != nil {
 				h.Logger.Warn("failed to call node", zap.Error(err))
