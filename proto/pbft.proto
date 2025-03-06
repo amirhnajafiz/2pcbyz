@@ -1,0 +1,74 @@
+syntax = "proto3";
+package pbft;
+
+import "google/protobuf/empty.proto";
+
+option go_package = "./rpc/pbft";
+
+// PBFT rpc services for transactions and pbft protocol.
+// this service is used for handling internal node calls.
+service PBFT {
+  rpc PrePrepare(PrePrepareMsg) returns (google.protobuf.Empty) {}
+  rpc AckPrePrepare(PrePrepareAck) returns (google.protobuf.Empty) {}
+  rpc Prepare(PrepareMsg) returns (google.protobuf.Empty) {}
+  rpc AckPrepare(PrepareAck) returns (google.protobuf.Empty) {}
+  rpc Commit(CommitMsg) returns (google.protobuf.Empty) {}
+}
+
+// transaction message contains a request operations sent by a client.
+message TransactionMsg {
+  string sender = 1;
+  string receiver = 2;
+  string return_address = 3;
+  int64 amount = 4;
+  int64 session_id = 5;
+  int64 sequence = 6;
+}
+
+// preprepare is sent by the leader to all other nodes to start PBFT.
+// digest is hash of (sender_receiver_returnaddress_amount_timestamp).
+message PrePrepareMsg {
+  TransactionMsg transaction = 1;
+  string transaction_digest = 2;
+  string node_id = 3;
+  int64 sequence = 4;
+  int64 view = 5;
+}
+
+// preprepare ack is sent by other nodes to the leader to follow preprepare.
+// preprepare digest is hash of (sequence_view_transactiondigest)
+// encrypted by the sign threshold key.
+message PrePrepareAck {
+  string preprepare_digest = 1;
+  string node_id = 2;
+  int64 sequence = 3;
+  int64 view = 4;
+}
+
+// preprepare is sent by the leader to all other nodes to start prepare.
+// preprepare digest can be decrypted using signs threshold keys.
+message PrepareMsg {
+  string preprepare_digest = 1;
+  string node_id = 2;
+  int64 sequence = 3;
+  int64 view = 4;
+}
+
+// prepare ack is sent by other nodes to the leader to follow prepare.
+// preprepare digest is hash of (sequence_view_prepreparedigest)
+// encrypted by the sign threshold key.
+message PrepareAck {
+  string prepare_digest = 1;
+  string node_id = 2;
+  int64 sequence = 3;
+  int64 view = 4;
+}
+
+// commit is sent by the leader to other nodes to finish PBFT.
+// prepare digest can be decrypted using signs threshold keys.
+message CommitMsg {
+  string prepare_digest = 1;
+  string node_id = 2;
+  int64 sequence = 3;
+  int64 view = 4;
+}
