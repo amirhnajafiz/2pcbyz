@@ -52,7 +52,7 @@ The system's behavior can be adjusted using the `config.json` file:
     "localhost:5002",
     "localhost:5003"
   ],
-  "byzantine_behavior": "none" // Options: none, crash, malicious
+  "byzantine_behavior": "none"
 }
 ```
 
