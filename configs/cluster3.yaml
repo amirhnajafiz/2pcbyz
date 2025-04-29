@@ -1,0 +1,45 @@
+# zap logger output logs level
+log_level: "debug"
+
+# name of the cluster
+name: "C3"
+leader: "S9"
+
+# handler configs
+handler:
+  instances: 1
+  queue_size: 20
+
+# replicas status
+replicas:
+  - name: "S9"
+    port: 8001
+  - name: "S10"
+    port: 8002
+  - name: "S11"
+    port: 8003
+  - name: "S12"
+    port: 8004
+
+# shard of the cluster
+shard:
+  cluster: "C3"
+  from: 2001
+  to: 3000
+
+# other shards
+shards:
+  - cluster: "C2"
+    from: 1001
+    to: 2000
+  - cluster: "C1"
+    from: 1
+    to: 1000
+  - cluster: "C3"
+    from: 2001
+    to: 3000
+
+# mongoDB values
+storage:
+  uri: "mongodb://localhost:27017"
+  database: "C3"

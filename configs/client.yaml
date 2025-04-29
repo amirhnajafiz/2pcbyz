@@ -1,0 +1,23 @@
+# client gRPC port
+grpc_port: 5001
+
+# consensus algorithm response limits
+response_limit: 1
+
+# shards metadata
+shards:
+  - name: "D1"
+    cluster: "C1"
+    range:
+      - 1
+      - 1000
+  - name: "D2"
+    cluster: "C2"
+    range:
+      - 1001
+      - 2000
+  - name: "D3"
+    cluster: "C3"
+    range:
+      - 2001
+      - 3000

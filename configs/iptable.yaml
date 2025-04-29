@@ -1,0 +1,24 @@
+# endpoints is a map of cluster and their nodes
+endpoints:
+  - "C1": "S1"
+  - "C2": "S5"
+  - "C3": "S9"
+  - "EC1": "S1:S2:S3:S4"
+  - "EC2": "S5:S6:S7:S8"
+  - "EC3": "S9:S10:S11:S12"
+  - "all": "S1:S2:S3:S4:S5:S6:S7:S8:S9:S10:S11:S12"
+
+# services is the map of each DNS record in our system
+services:
+  - "S1": "localhost:6001"
+  - "S2": "localhost:6002"
+  - "S3": "localhost:6003"
+  - "S4": "localhost:6004"
+  - "S5": "localhost:7001"
+  - "S6": "localhost:7002"
+  - "S7": "localhost:7003"
+  - "S8": "localhost:7004"
+  - "S9": "localhost:8001"
+  - "S10": "localhost:8002"
+  - "S11": "localhost:8003"
+  - "S12": "localhost:8004"
